@@ -1,0 +1,30 @@
+<.header>
+  Active Devices
+</.header>
+
+<.table
+  id="devices"
+  rows={@streams.devices}
+  row_click={fn {_id, device} -> JS.navigate(~p"/devices/#{device.id}") end}
+>
+  <:action :let={{_id, device}}>
+    <div class="sr-only">
+      <.link navigate={~p"/devices/#{device.device_id()}"}>Show</.link>
+    </div>
+    <.link patch={~p"/devices/#{device.device_id()}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{_id, _device}}></:action>
+  <:col :let={{_id, device}} label="Device ID">{device.device_id}</:col>
+  <:col :let={{_id, device}} label="IP">{Tuple.to_list(device.ip) |> Enum.join(".")}</:col>
+</.table>
+
+<.modal :if={@live_action in [:edit]} id="device-modal" show on_cancel={JS.patch(~p"/devices")}>
+  <.live_component
+    module={OpenBossWeb.DevicesLive.FormComponent}
+    id={@device.id || :new}
+    title={@page_title}
+    action={@live_action}
+    device={@device}
+    patch={~p"/devices"}
+  />
+</.modal>
