@@ -1,101 +1,92 @@
 <.header>
-  Device {@devices.device_id}
-  <:subtitle :if={@devices.last_update}>
-    {"Last updated #{Calendar.strftime(@devices.last_update, "%Y-%m-%d %I:%M:%S %p %Z")}"}
+  Device {@device.device_id}
+  <:subtitle>
+    {"Last updated #{Calendar.strftime(@device.updated_at, "%Y-%m-%d %I:%M:%S %p %Z")}"}
   </:subtitle>
   <:actions>
-    <.link patch={~p"/devices/#{@devices.device_id}/show/edit"} phx-click={JS.push_focus()}>
+    <.link patch={~p"/devices/#{@device.id}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Set Temp</.button>
     </.link>
   </:actions>
 </.header>
-
+<.back navigate={~p"/devices"}>Back to devices</.back>
 <.list>
   <:item title="Desired Temp">
-    {OpenBoss.Utils.display_temp(@devices.set_temp)}
+    {OpenBoss.Utils.display_temp(@device.set_temp)}
   </:item>
-  <:item title="Fan">{OpenBoss.Utils.safe_round(@devices.blower)}%</:item>
+  <:item title="Fan">
+    {OpenBoss.Utils.safe_round(@device.blower)}%
+  </:item>
   <:item title="Pit 1">
-    {OpenBoss.Utils.display_temp(@devices.temps.pit_1)}
+    {OpenBoss.Utils.display_temp(get_in(@device, [Access.key!(:temps), Access.key!(:pit_1)]))}
   </:item>
   <:item title="Pit 2">
-    {OpenBoss.Utils.display_temp(@devices.temps.pit_2)}
+    {OpenBoss.Utils.display_temp(get_in(@device, [Access.key!(:temps), Access.key!(:pit_2)]))}
   </:item>
   <:item title="Meat 1">
-    {OpenBoss.Utils.display_temp(@devices.temps.meat_1)}
+    {OpenBoss.Utils.display_temp(get_in(@device, [Access.key!(:temps), Access.key!(:meat_1)]))}
   </:item>
   <:item title="Meat 2">
-    {OpenBoss.Utils.display_temp(@devices.temps.meat_2)}
+    {OpenBoss.Utils.display_temp(get_in(@device, [Access.key!(:temps), Access.key!(:meat_2)]))}
   </:item>
-</.list>
-<.list>
-  <:item :if={@devices.protocol} title="Protocol Version">
-    {@devices.protocol.version}
-  </:item>
-</.list>
-<.list :if={@devices.id_message}>
   <:item title="Hardware ID">
-    {@devices.id_message.hw_id}
+    {@device.hw_id}
   </:item>
   <:item title="Device ID">
-    {@devices.id_message.device_id}
+    {@device.device_id}
   </:item>
   <:item title="UID">
-    {@devices.id_message.uid}
+    {@device.uid}
   </:item>
   <:item title="PIN">
-    {@devices.id_message.pin}
+    {@device.pin}
   </:item>
   <:item title="Disabled">
-    {@devices.id_message.disabled}
+    {@device.disabled}
   </:item>
-</.list>
-<.list :if={@devices.ntp}>
+  <:item title="Protocol Version">
+    {@device.protocol_version}
+  </:item>
   <:item title="NTP Host">
-    {@devices.ntp.host}
+    {@device.ntp_host}
   </:item>
-</.list>
-<.list :if={@devices.versions}>
   <:item title="App Version">
-    {@devices.versions.app}
+    {@device.app_version}
   </:item>
   <:item title="Boot Version">
-    {@devices.versions.boot}
+    {@device.boot_version}
   </:item>
   <:item title="BT Version">
-    {@devices.versions.bt}
+    {@device.bt_version}
   </:item>
   <:item title="WiFi Version">
-    {@devices.versions.wifi}
+    {@device.wifi_version}
   </:item>
   <:item title="HW ID">
-    {@devices.versions.hw_id}
+    {@device.hw_id_version}
   </:item>
   <:item title="Next Address">
-    {@devices.versions.next_addr}
+    {@device.next_addr_version}
   </:item>
   <:item title="POS">
-    {@devices.versions.pos}
+    {@device.pos_version}
   </:item>
   <:item title="Revert Available">
-    {if @devices.versions.revert_avail, do: true, else: false}
+    {@device.revert_avail_version}
   </:item>
 </.list>
-
-<.back navigate={~p"/devices"}>Back to devices</.back>
-
 <.modal
   :if={@live_action == :edit}
   id="device-modal"
   show
-  on_cancel={JS.patch(~p"/devices/#{@devices.device_id}")}
+  on_cancel={JS.patch(~p"/devices/#{@device.id}")}
 >
   <.live_component
     module={OpenBossWeb.DevicesLive.FormComponent}
-    id={@devices.device_id}
+    id={@device.id}
     title={@page_title}
     action={@live_action}
     device={@device}
-    patch={~p"/devices/#{@devices.device_id}"}
+    patch={~p"/devices/#{@device.id}"}
   />
 </.modal>

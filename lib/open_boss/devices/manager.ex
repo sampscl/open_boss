@@ -7,20 +7,31 @@ defmodule OpenBoss.Devices.Manager do
 
   use GenServer, restart: :transient
 
+  import Ecto.Query
+
   alias OpenBoss.Devices
+  alias OpenBoss.Devices.Device
   alias OpenBoss.Devices.Payload
+  alias OpenBoss.Repo
+
+  @type init_param() :: %{
+          ip: :inet.socket_address(),
+          port: non_neg_integer(),
+          services: list(String.t()),
+          domain: String.t()
+        }
 
   @spec start_link(any) :: GenServer.on_start()
   def start_link(params), do: GenServer.start_link(__MODULE__, params, name: __MODULE__)
 
-  @spec list() :: list(Devices.device_state())
+  @spec list() :: list(Device.t())
   def list, do: GenServer.call(__MODULE__, :list)
 
-  @spec ensure_managed(Devices.init_param()) :: :ok
-  def ensure_managed(device), do: GenServer.cast(__MODULE__, {:ensure_managed, device})
+  @spec ensure_managed(init_param()) :: :ok
+  def ensure_managed(param), do: GenServer.cast(__MODULE__, {:ensure_managed, param})
 
   @spec device_state(device_id :: non_neg_integer()) ::
-          {:ok, Devices.device_state()} | {:error, :not_found}
+          {:ok, Device.t()} | {:error, :not_found}
   def device_state(device_id), do: GenServer.call(__MODULE__, {:device_state, device_id})
 
   @spec set_temp(
@@ -43,15 +54,13 @@ defmodule OpenBoss.Devices.Manager do
     alias OpenBoss.Devices
 
     defstruct [
-      :devices,
-      :mqtt_pids
+      :mqtt_pids,
+      :device_ids
     ]
 
     @type t() :: %__MODULE__{
-            devices: %{
-              Devices.id() => Devices.device_state()
-            },
-            mqtt_pids: %{pid() => Devices.id()}
+            mqtt_pids: %{Devices.id() => pid()},
+            device_ids: %{pid() => Devices.id()}
           }
   end
 
@@ -59,63 +68,80 @@ defmodule OpenBoss.Devices.Manager do
   def init(_) do
     Logger.info("Starting")
     send(self(), :ping)
-    {:ok, %State{devices: %{}, mqtt_pids: %{}}}
+    {:ok, %State{mqtt_pids: %{}, device_ids: %{}}}
   end
 
   @impl GenServer
-  def handle_call({:device_state, device_id}, _from, %{devices: devices} = state) do
-    if device = Map.get(devices, device_id) do
+  def handle_call({:device_state, device_id}, _from, %{mqtt_pids: mqtt_pids} = state) do
+    if Map.has_key?(mqtt_pids, device_id) do
+      device = load_device(device_id)
       {:reply, {:ok, device}, state}
     else
+      # do not give active device state for inactive devices
       {:reply, {:error, :not_found}, state}
     end
   end
 
   @impl GenServer
-  def handle_call(:list, _from, %{devices: devices} = state) do
-    result = Enum.map(devices, fn {_, device_state} -> device_state end)
+  def handle_call(:list, _from, %{mqtt_pids: mqtt_pids} = state) do
+    result =
+      from(d in Device,
+        where: d.id in ^Map.keys(mqtt_pids)
+      )
+      |> Repo.all()
+
     {:reply, result, state}
   end
 
   @impl GenServer
-  def handle_call({:set_temp, device_id, celsius}, _from, %{devices: devices} = state) do
-    device = Map.get(devices, device_id)
+  def handle_call(
+        {:set_temp, device_id, celsius},
+        _from,
+        %{mqtt_pids: mqtt_pids} = state
+      ) do
+    result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.run(:mqtt_pid, fn _repo, _changes -> Map.fetch(mqtt_pids, device_id) end)
+      |> Ecto.Multi.run(:device, fn _repo, _changes ->
+        if device = load_device(device_id) do
+          Device.changeset(device, %{requested_temp: celsius}) |> Repo.update()
+        else
+          {:error, :not_found}
+        end
+      end)
+      |> Ecto.Multi.run(:mqtt_pub, fn _repo, %{mqtt_pid: mqtt_pid} ->
+        :emqtt.publish(
+          mqtt_pid,
+          "flameboss/#{device_id}/recv",
+          Jason.encode!(%{
+            "name" => "set_temp",
+            "value" => Payload.encode_temp(celsius)
+          })
+        )
+        |> case do
+          {:error, _} = err ->
+            err
 
-    {result, new_device_state} =
-      case :emqtt.publish(
-             device.mqtt_pid(),
-             "flameboss/#{device_id}/recv",
-             Jason.encode!(%{
-               "name" => "set_temp",
-               "value" => Payload.encode_temp(celsius)
-             })
-           ) do
-        :ok ->
-          new_state = %{device | requested_temp: celsius}
-          :ok = pub_device_state!(new_state)
-          {:ok, new_state}
+          _ok ->
+            {:ok, :ok}
+        end
+      end)
+      |> Ecto.Multi.run(:pub, fn _repo, %{device: device} ->
+        {:ok, pub_device_state!(device)}
+      end)
+      |> Repo.transaction()
 
-        {:ok, reply} ->
-          Logger.debug("Unexpected reply on set_temp: #{inspect(reply)}")
-          new_state = %{device | requested_temp: celsius}
-          :ok = pub_device_state!(new_state)
-          {:ok, new_state}
-
-        err ->
-          {err, device}
-      end
-
-    {:reply, result, %{state | devices: Map.put(devices, device_id, new_device_state)}}
+    {:reply, result, state}
   end
 
   @impl GenServer
   def handle_cast(
-        {:ensure_managed, %{domain: domain, ip: ip, port: port, services: services}},
-        %{devices: devices, mqtt_pids: mqtt_pids} = state
+        {:ensure_managed, %{domain: domain, ip: ip, port: port, services: _services}},
+        %{mqtt_pids: mqtt_pids, device_ids: device_ids} = state
       ) do
     device_id = domain_to_device_id(domain)
 
-    if _existing = Map.get(devices, device_id) do
+    if _existing = Map.get(mqtt_pids, device_id) do
       {:noreply, state}
     else
       Logger.info("Starting MQTT for #{domain}")
@@ -157,38 +183,27 @@ defmodule OpenBoss.Devices.Manager do
 
       Logger.info("Connected (#{client_id})")
 
-      device_state = %{
-        ip: ip,
-        port: port,
-        services: services,
-        domain: domain,
-        client_id: client_id,
-        mqtt_pid: mqtt_pid,
-        device_id: device_id,
-        requested_temp: nil,
-        set_temp: nil,
-        temps: %{pit_1: nil, meat_1: nil, pit_2: nil, meat_2: nil},
-        blower: nil,
-        protocol: nil,
-        id_message: nil,
-        set_temp_limits: nil,
-        ntp: nil,
-        versions: nil,
-        last_update: nil
-      }
-
-      updated_state = %{
-        state
-        | devices: Map.put(devices, device_id, device_state),
-          mqtt_pids: Map.put(mqtt_pids, mqtt_pid, device_id)
-      }
+      {:ok, device} =
+        (load_device(device_id) || %Device{id: device_id})
+        |> Device.changeset(%{
+          id: device_id,
+          ip: ip_string,
+          port: port
+        })
+        |> Repo.insert_or_update()
 
       :ok =
         Phoenix.PubSub.broadcast(
           OpenBoss.PubSub,
           "device-presence",
-          {:worker_start, device_state}
+          {:worker_start, device}
         )
+
+      updated_state = %{
+        state
+        | mqtt_pids: Map.put(mqtt_pids, device_id, mqtt_pid),
+          device_ids: Map.put(device_ids, mqtt_pid, device_id)
+      }
 
       {:noreply, updated_state}
     end
@@ -198,7 +213,7 @@ defmodule OpenBoss.Devices.Manager do
   def handle_info(:ping, %{mqtt_pids: mqtt_pids} = state) do
     _ = Process.send_after(self(), :ping, :timer.minutes(1))
 
-    Enum.each(Map.keys(mqtt_pids), fn pid ->
+    Enum.each(Map.values(mqtt_pids), fn pid ->
       Task.Supervisor.start_child(OpenBoss.TaskSupervisor, fn ->
         ping(pid)
       end)
@@ -210,11 +225,14 @@ defmodule OpenBoss.Devices.Manager do
   @impl GenServer
   def handle_info(
         {:DOWN, _ref, :process, pid, reason},
-        %{devices: devices, mqtt_pids: mqtt_pids} = state
+        %{mqtt_pids: mqtt_pids, device_ids: device_ids} = state
       ) do
-    maybe_device_id = Map.get(mqtt_pids, pid)
+    maybe_device_id =
+      Enum.reduce_while(mqtt_pids, nil, fn {device_id, mqtt_pid}, _ ->
+        if mqtt_pid == pid, do: {:halt, device_id}, else: {:cont, nil}
+      end)
 
-    if device = Map.get(devices, maybe_device_id) do
+    if device = load_device(maybe_device_id) do
       Logger.info("Lost device #{inspect({pid, device, reason})}")
 
       :ok =
@@ -227,8 +245,8 @@ defmodule OpenBoss.Devices.Manager do
       {:noreply,
        %{
          state
-         | devices: Map.delete(devices, maybe_device_id),
-           mqtt_pids: Map.delete(mqtt_pids, pid)
+         | mqtt_pids: Map.delete(mqtt_pids, maybe_device_id),
+           device_ids: Map.delete(device_ids, pid)
        }}
     else
       Logger.warning("Unknown device #{inspect({pid, reason})}")
@@ -239,27 +257,27 @@ defmodule OpenBoss.Devices.Manager do
   @impl GenServer
   def handle_info(
         {:publish, %{client_pid: mqtt_pid, payload: payload}} = msg,
-        %{devices: devices, mqtt_pids: mqtt_pids} = state
+        %{device_ids: device_ids} = state
       ) do
-    maybe_device_id = Map.get(mqtt_pids, mqtt_pid)
+    maybe_device_id = Map.get(device_ids, mqtt_pid)
 
-    if device = Map.get(devices, maybe_device_id) do
-      updated_device = Payload.handle_payload(device, payload)
+    if device = load_device(maybe_device_id) do
+      {:ok, updated_device} = Payload.handle_payload(device, payload) |> Repo.update()
       :ok = pub_device_state!(updated_device)
-      {:noreply, %{state | devices: Map.put(devices, maybe_device_id, updated_device)}}
     else
       Logger.warning("Got message for unknown pid: #{inspect(msg)}")
-      {:noreply, state}
     end
+
+    {:noreply, state}
   end
 
-  @spec pub_device_state!(Devices.device_state()) :: :ok
-  defp pub_device_state!(%{device_id: device_id} = state) do
+  @spec pub_device_state!(Device.t()) :: :ok
+  defp pub_device_state!(device) do
     :ok =
       Phoenix.PubSub.broadcast!(
         OpenBoss.PubSub,
-        "device-state-#{device_id}",
-        {:device_state, state}
+        "device-state-#{device.id}",
+        {:device_state, device}
       )
   end
 
@@ -288,4 +306,8 @@ defmodule OpenBoss.Devices.Manager do
         {:error, :ack_timeout}
     end
   end
+
+  @spec load_device(integer() | nil) :: Device.t() | nil
+  defp load_device(nil), do: nil
+  defp load_device(device_id), do: Repo.get(Device, device_id)
 end

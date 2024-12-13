@@ -27,7 +27,7 @@ defmodule OpenBoss.Repo.Migrations.AddDevices do
       add(:pos_version, :integer, null: true)
       add(:revert_avail_version, :boolean, null: true)
       add(:wifi_version, :string, null: true)
-      timestamps(:utc_datetime)
+      timestamps(type: :utc_datetime)
     end
   end
 end

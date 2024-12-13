@@ -6,6 +6,8 @@ defmodule OpenBoss.Devices.Device do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias OpenBoss.Devices.Temps
+
   @type t() :: %__MODULE__{}
 
   @required_fields [:id]
@@ -15,7 +17,6 @@ defmodule OpenBoss.Devices.Device do
               :port,
               :requested_temp,
               :set_temp,
-              :temps,
               :blower,
               :protocol_version,
               :hw_id,
@@ -36,12 +37,14 @@ defmodule OpenBoss.Devices.Device do
               :wifi_version
             ]
 
+  @primary_key {:id, :integer, autogenerate: false}
+
   schema "devices" do
     field(:ip, :string)
     field(:port, :integer)
     field(:requested_temp, :float)
     field(:set_temp, :float)
-    field(:temps, :map)
+    embeds_one(:temps, Temps, on_replace: :update)
     field(:blower, :float)
     field(:protocol_version, :integer)
     field(:hw_id, :integer)
@@ -67,6 +70,7 @@ defmodule OpenBoss.Devices.Device do
   def changeset(%__MODULE__{} = device, params) do
     device
     |> cast(params, @fields)
+    |> cast_embed(:temps)
     |> validate_required(@required_fields)
     |> unique_constraint(:id)
   end
