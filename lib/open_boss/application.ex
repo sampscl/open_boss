@@ -17,6 +17,7 @@ defmodule OpenBoss.Application do
     end
 
     children = [
+      {Ecto.Migrator, repos: Application.fetch_env!(:open_boss, :ecto_repos)},
       OpenBossWeb.Telemetry,
       OpenBoss.Repo,
       {DNSCluster, query: Application.get_env(:open_boss, :dns_cluster_query) || :ignore},

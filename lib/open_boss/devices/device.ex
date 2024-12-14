@@ -34,7 +34,8 @@ defmodule OpenBoss.Devices.Device do
               :next_addr_version,
               :pos_version,
               :revert_avail_version,
-              :wifi_version
+              :wifi_version,
+              :name
             ]
 
   @primary_key {:id, :integer, autogenerate: false}
@@ -63,6 +64,7 @@ defmodule OpenBoss.Devices.Device do
     field(:pos_version, :integer)
     field(:revert_avail_version, :boolean)
     field(:wifi_version, :string)
+    field(:name, :string)
     timestamps(type: :utc_datetime)
   end
 

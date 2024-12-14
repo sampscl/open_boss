@@ -19,6 +19,6 @@ defmodule OpenBoss.Utils do
   def display_temp(nil), do: "-"
 
   def display_temp(celsius) do
-    "#{round(celsius)}\u00b0C / #{celsius_to_farenheit(celsius) |> round()}\u00b0F"
+    "#{celsius_to_farenheit(celsius) |> round()}\u00b0F / #{round(celsius)}\u00b0C"
   end
 end

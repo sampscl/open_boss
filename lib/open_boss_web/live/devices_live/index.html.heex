@@ -14,7 +14,9 @@
     <.link patch={~p"/devices/#{device.id}/edit"}>Edit</.link>
   </:action>
   <:action :let={{_id, _device}}></:action>
-  <:col :let={{_id, device}} label="Device ID">{device.id}</:col>
+  <:col :let={{_id, device}} label="Device">
+    {device.name || device.id}
+  </:col>
   <:col :let={{_id, device}} label="Host">{device.ip}:{device.port}</:col>
 </.table>
 
