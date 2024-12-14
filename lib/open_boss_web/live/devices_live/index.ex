@@ -21,7 +21,7 @@ defmodule OpenBossWeb.DevicesLive.Index do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
-  defp apply_action(socket, :edit, %{"device_id" => id}) do
+  defp apply_action(socket, :edit, %{"id" => id}) do
     device_id = String.to_integer(id)
 
     case Devices.device_state(device_id) do
