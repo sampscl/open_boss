@@ -7,7 +7,7 @@ defmodule OpenBoss.DevicesFixtures do
   @doc """
   Generate a device.
   """
-  def cook_fixture(attrs \\ %{}) do
+  def device_fixture(attrs \\ %{}) do
     cs =
       Enum.into(attrs, %{
         id: 1,
