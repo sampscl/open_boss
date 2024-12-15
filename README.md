@@ -21,6 +21,7 @@ Urgent
 Not So Urgent
 
 - [ ] Reorganize documentation
+- [ ] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
 - [ ] Support devices other than Egg Genius
 - [ ] Figure out "Raspberry Pi with Kiosk Mode"; separate project or embedded here?
 - [ ] Better github integration
@@ -30,7 +31,7 @@ Not So Urgent
 - Send a HTTP GET request to `/switch` to cause the device to enter "Flame Boss Protocol"; it is currently unknown what this
   really does, but the iOS app does it and so shall Open Boss
 - The MQTT topics are `flameboss/<DEVICE_SERIAL_NUMBER>/...`
-- Temperatures are degrees celcius \* 10, so 1489 is 148.9 degrees C
+- Temperatures are degrees celsius \* 10, so 1489 is 148.9 degrees C
 - Temperature values range from -32767 to 32768
 - Blower values are percentage \* 100, so 10000 is 100%
 - Publish to `flameboss/<DEVICE_SERIAL_NUMBER>/recv`
