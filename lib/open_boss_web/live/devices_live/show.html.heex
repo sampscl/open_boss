@@ -1,18 +1,18 @@
 <.header>
-  Device {@device.name || @device.id}
+  Device {OpenBoss.Devices.Device.get_name(@device)}
   <:subtitle>
     {"Last updated #{Calendar.strftime(@device.updated_at, "%Y-%m-%d %I:%M:%S %p %Z")}"}
   </:subtitle>
   <:actions>
     <.link patch={~p"/devices/#{@device.id}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Set Temp</.button>
+      <.button>Configure...</.button>
     </.link>
   </:actions>
 </.header>
-<.back navigate={~p"/devices"}>Back to devices</.back>
+<.back navigate={~p"/devices"}>Back to Devices</.back>
 <.list>
   <:item title="Desired Temp">
-    {OpenBoss.Utils.display_temp(@device.set_temp)}
+    {"#{OpenBoss.Utils.display_temp(@device.set_temp)}"}
   </:item>
   <:item title="Fan">
     {OpenBoss.Utils.safe_round(@device.blower)}%

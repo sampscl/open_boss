@@ -75,5 +75,19 @@ defmodule OpenBoss.Devices.Device do
     |> cast_embed(:temps)
     |> validate_required(@required_fields)
     |> unique_constraint(:id)
+    |> validate_temp(device, :set_temp)
   end
+
+  @spec get_name(t()) :: String.t()
+  def get_name(device), do: "#{device.name || device.id}"
+
+  @spec validate_temp(Ecto.Changeset.t(t()), t(), atom()) :: Ecto.Changeset.t(t())
+  def validate_temp(cs, %{min_temp: min, max_temp: max}, field)
+      when not is_nil(min) and not is_nil(max) do
+    cs
+    |> validate_number(field, greater_than_or_equal_to: min)
+    |> validate_number(field, less_than_or_equal_to: max)
+  end
+
+  def validate_temp(cs, _, _), do: cs
 end

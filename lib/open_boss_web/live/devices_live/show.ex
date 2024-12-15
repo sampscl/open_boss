@@ -35,6 +35,11 @@ defmodule OpenBossWeb.DevicesLive.Show do
     {:noreply, assign(socket, :device, state)}
   end
 
+  @impl true
+  def handle_info({OpenBossWeb.DevicesLive.FormComponent, {:saved, device}}, socket) do
+    {:noreply, assign(socket, :device, device)}
+  end
+
   defp page_title(:show), do: "Device"
-  defp page_title(:edit), do: "Control Device"
+  defp page_title(:edit), do: "Configure Device"
 end

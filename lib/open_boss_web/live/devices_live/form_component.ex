@@ -2,31 +2,8 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
   use OpenBossWeb, :live_component
 
   alias OpenBoss.Devices.Device
+  alias OpenBoss.Devices.Manager
   alias OpenBoss.Repo
-
-  @impl true
-  def render(assigns) do
-    ~H"""
-    <div>
-      <.header>
-        {@title}
-        <:subtitle>Use this form to manage device records in your database.</:subtitle>
-      </.header>
-
-      <.simple_form
-        for={@form}
-        id="device-form"
-        phx-target={@myself}
-        phx-change="validate"
-        phx-submit="save"
-      >
-        <:actions>
-          <.button phx-disable-with="Saving...">Save Device</.button>
-        </:actions>
-      </.simple_form>
-    </div>
-    """
-  end
 
   @impl true
   def update(%{device: device} = assigns, socket) do
@@ -49,15 +26,32 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
   end
 
   defp save_device(socket, :edit, device_params) do
-    changeset = Device.changeset(socket.assigns.device, device_params)
+    {_, updated_params} =
+      Map.get_and_update(device_params, "set_temp", fn
+        nil ->
+          {nil, nil}
+
+        farenheit_str ->
+          {farenheit, _} = Float.parse(farenheit_str)
+          {farenheit, OpenBoss.Utils.farenheit_to_celsius(farenheit)}
+      end)
+
+    changeset =
+      Device.changeset(
+        socket.assigns.device,
+        updated_params
+      )
 
     case Repo.update(changeset) do
       {:ok, device} ->
+        if Ecto.Changeset.changed?(changeset, :set_temp),
+          do: Manager.set_temp(device.id, updated_params["set_temp"], :celsius)
+
         notify_parent({:saved, device})
 
         {:noreply,
          socket
-         |> put_flash(:info, "Device updated successfully")
+         |> put_flash(:info, "Device #{Device.get_name(device)} updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->

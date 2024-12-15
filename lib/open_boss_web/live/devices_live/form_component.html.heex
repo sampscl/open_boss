@@ -1,0 +1,33 @@
+<div>
+  <.header>
+    {@title}
+    <:subtitle>{OpenBoss.Devices.Device.get_name(@device)}</:subtitle>
+  </.header>
+
+  <.simple_form
+    for={@form}
+    id="device-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="field">
+      <label for="device_set_temp">Set Temperature</label>
+      <.input
+        type="number"
+        name="device[set_temp]"
+        id="device_set_temp"
+        value={OpenBoss.Utils.celsius_to_farenheit(@device.set_temp) |> round()}
+      />
+    </div>
+
+    <div class="field">
+      <label for="device_name">Name</label>
+      <.input type="text" name="device[name]" id="device_name" value={@device.name} />
+    </div>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">Save Device</.button>
+    </:actions>
+  </.simple_form>
+</div>

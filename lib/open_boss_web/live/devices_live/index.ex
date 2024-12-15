@@ -27,7 +27,7 @@ defmodule OpenBossWeb.DevicesLive.Index do
     case Devices.device_state(device_id) do
       {:ok, device_state} ->
         socket
-        |> assign(:page_title, "Edit Device")
+        |> assign(:page_title, "Configure Device")
         |> assign(:device, device_state)
 
       {:error, :not_found} ->

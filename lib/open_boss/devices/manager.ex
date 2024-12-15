@@ -126,7 +126,10 @@ defmodule OpenBoss.Devices.Manager do
             {:ok, :ok}
         end
       end)
-      |> Ecto.Multi.run(:pub, fn _repo, %{device: device} ->
+      |> Ecto.Multi.run(:update_device, fn _repo, %{device: device} ->
+        Device.changeset(device, %{requested_temp: celsius}) |> Repo.update()
+      end)
+      |> Ecto.Multi.run(:pub, fn _repo, %{update_device: device} ->
         {:ok, pub_device_state!(device)}
       end)
       |> Repo.transaction()

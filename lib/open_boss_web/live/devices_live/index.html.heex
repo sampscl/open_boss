@@ -9,21 +9,23 @@
 >
   <:action :let={{_id, device}}>
     <div class="sr-only">
-      <.link navigate={~p"/devices/#{device.id()}"}>Show</.link>
+      <.link navigate={~p"/devices/#{device.id}"}>Show</.link>
     </div>
-    <.link patch={~p"/devices/#{device.id}/edit"}>Edit</.link>
+    <.link patch={~p"/devices/#{device.id}/edit"}>Configure...</.link>
   </:action>
-  <:action :let={{_id, _device}}></:action>
   <:col :let={{_id, device}} label="Device">
-    {device.name || device.id}
+    {OpenBoss.Devices.Device.get_name(device)}
+  </:col>
+  <:col :let={{_id, device}} label="Set Temp">
+    {"#{OpenBoss.Utils.display_temp(device.set_temp)}"}
   </:col>
   <:col :let={{_id, device}} label="Host">{device.ip}:{device.port}</:col>
 </.table>
 
-<.modal :if={@live_action in [:edit]} id="device-modal" show on_cancel={JS.patch(~p"/devices")}>
+<.modal :if={@live_action == :edit} id="device-modal" show on_cancel={JS.patch(~p"/devices")}>
   <.live_component
     module={OpenBossWeb.DevicesLive.FormComponent}
-    id={@device.id || :new}
+    id={@device.id}
     title={@page_title}
     action={@live_action}
     device={@device}
