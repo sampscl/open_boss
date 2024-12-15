@@ -11,6 +11,9 @@ config :open_boss,
   ecto_repos: [OpenBoss.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+# Configure devices behavior
+config :open_boss, OpenBoss.Devices, list: :live
+
 # Configure sqlite
 config :ecto_sqlite3,
   binary_id_type: :binary,

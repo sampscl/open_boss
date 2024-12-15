@@ -1,5 +1,8 @@
 import Config
 
+# Test env lists all devices
+config :open_boss, OpenBoss.Devices, list: :all
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used

@@ -21,12 +21,9 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  raise "Missing prod repo config"
-
-  # Set database file
+  # Config database
   config :open_boss, OpenBoss.Repo,
-    # TODO: configure database for prod
-    database: nil,
+    database: System.fetch_env!("DB_DIR"),
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.

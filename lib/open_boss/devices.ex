@@ -5,21 +5,24 @@ defmodule OpenBoss.Devices do
 
   alias OpenBoss.Devices.Device
   alias OpenBoss.Devices.Manager
-  alias OpenBoss.Repo
 
   @type id() :: non_neg_integer()
 
-  @doc """
-  Get a list of all active devices
-  """
-  @spec list() :: list(Device.t())
-  defdelegate list, to: Manager
+  case Application.compile_env!(:open_boss, __MODULE__) |> Keyword.fetch!(:list) do
+    :live ->
+      @doc """
+      Get a list of all active devices
+      """
+      @spec list() :: list(Device.t())
+      defdelegate list, to: Manager
 
-  @doc """
-  Get a list of all devices, active and inactive
-  """
-  @spec list_all() :: list(Device.t())
-  def list_all, do: Repo.all(Device)
+    :all ->
+      @doc """
+      Get a list of all devices, active and inactive
+      """
+      @spec list() :: list(Device.t())
+      def list, do: OpenBoss.Repo.all(Device)
+  end
 
   @spec device_state(device_id :: non_neg_integer()) ::
           {:ok, Device.t()} | {:error, :not_found}
