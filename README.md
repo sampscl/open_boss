@@ -68,7 +68,7 @@ These are received from the device (it is the sender)
 Device ID from `flameboss/<DEVICE_SERIAL_NUMBER>/send/data`
 
 ```json
-%{
+{
   "device_id": 000000,
   "disabled": false,
   "hw_id": 10,
