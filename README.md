@@ -4,6 +4,11 @@ An open source [licensed](LICENSE.txt) Elixir application to control Flame Boss
 and white labeled Flame Boss controllers like the Egg Genius (which happens to
 be the device the author owns and used to reverse the MQTT protocol).
 
+## What Works Today
+
+- Discovery of Flame Boss devices on the local network via mDNS
+- Basic control of Egg Genius, maybe others like the Flame Boss 400
+
 ## TODO
 
 Urgent
@@ -63,12 +68,12 @@ Device ID from `flameboss/<DEVICE_SERIAL_NUMBER>/send/data`
 
 ```json
 %{
-  "device_id" => 000000,
-  "disabled" => false,
-  "hw_id" => 10,
-  "name" => "id",
-  "pin" => 4257,
-  "uid" => "pOV8rD3sAAAAAAAAAAAAAA=="
+  "device_id": 000000,
+  "disabled": false,
+  "hw_id": 10,
+  "name": "id",
+  "pin": 4257,
+  "uid": "pOV8rD3sAAAAAAAAAAAAAA=="
 }
 ```
 
