@@ -19,7 +19,9 @@
   <:col :let={{_id, device}} label="Set Temp">
     {"#{OpenBoss.Utils.display_temp(device.set_temp)}"}
   </:col>
-  <:col :let={{_id, device}} label="Host">{device.ip}:{device.port}</:col>
+  <:col :let={{_id, device}} label="Last Updated">
+    {Calendar.strftime(device.updated_at, "%Y-%m-%d %I:%M:%S %p %Z")}
+  </:col>
 </.table>
 
 <.modal :if={@live_action == :edit} id="device-modal" show on_cancel={JS.patch(~p"/devices")}>

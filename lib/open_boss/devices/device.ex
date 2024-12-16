@@ -10,7 +10,7 @@ defmodule OpenBoss.Devices.Device do
 
   @type t() :: %__MODULE__{}
 
-  @required_fields [:id]
+  @required_fields [:id, :last_communication]
   @fields @required_fields ++
             [
               :ip,
@@ -65,6 +65,7 @@ defmodule OpenBoss.Devices.Device do
     field(:revert_avail_version, :boolean)
     field(:wifi_version, :string)
     field(:name, :string)
+    field(:last_communication, :utc_datetime_usec)
     timestamps(type: :utc_datetime)
   end
 

@@ -15,7 +15,10 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
-      }
+      },
+      backgroundImage: {
+        'custom-artwork': "url('/images/open_boss_embossed.png')",
+      },
     },
   },
   plugins: [

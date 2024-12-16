@@ -191,7 +191,8 @@ defmodule OpenBoss.Devices.Manager do
         |> Device.changeset(%{
           id: device_id,
           ip: ip_string,
-          port: port
+          port: port,
+          last_communication: DateTime.utc_now()
         })
         |> Repo.insert_or_update()
 
@@ -265,7 +266,11 @@ defmodule OpenBoss.Devices.Manager do
     maybe_device_id = Map.get(device_ids, mqtt_pid)
 
     if device = load_device(maybe_device_id) do
-      {:ok, updated_device} = Payload.handle_payload(device, payload) |> Repo.update()
+      {:ok, updated_device} =
+        Payload.handle_payload(device, payload)
+        |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now()})
+        |> Repo.update()
+
       :ok = pub_device_state!(updated_device)
     else
       Logger.warning("Got message for unknown pid: #{inspect(msg)}")

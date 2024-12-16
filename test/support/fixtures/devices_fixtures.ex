@@ -40,6 +40,7 @@ defmodule OpenBoss.DevicesFixtures do
           pos_version: 0,
           revert_avail_version: nil,
           wifi_version: "0.0.0",
+          last_communication: ~U[1970-01-01 00:00:00Z],
           inserted_at: ~U[2024-12-13 14:24:47Z],
           updated_at: ~U[2024-12-13 16:27:49Z]
         },
