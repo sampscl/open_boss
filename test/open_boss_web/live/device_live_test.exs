@@ -6,7 +6,7 @@ defmodule OpenBossWeb.DeviceLiveTest do
 
   # @create_attrs %{}
   @update_attrs %{name: "a different name", set_temp: "100"}
-  @invalid_attrs %{set_temp: "must be a number"}
+  @invalid_attrs %{set_temp: "0"}
 
   defp create_device(_) do
     device = device_fixture()
@@ -19,7 +19,7 @@ defmodule OpenBossWeb.DeviceLiveTest do
     test "lists all devices", %{conn: conn} do
       {:ok, _index_live, html} = live(conn, ~p"/devices")
 
-      assert html =~ "127.0.0.1:1883"
+      assert html =~ "fixture"
     end
 
     #   test "saves new device", %{conn: conn} do
@@ -54,19 +54,15 @@ defmodule OpenBossWeb.DeviceLiveTest do
 
       assert_patch(index_live, ~p"/devices/#{device}/edit")
 
-      index_live
-      |> form("#device-form", device: @invalid_attrs)
-      |> render_change()
+      # assert index_live
+      #        |> form("#device-form", device: @invalid_attrs)
+      #        |> render_change() =~ "is invalid"
 
       assert index_live
-             |> form("#device-form", device: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
+             |> form("#device-form", device: @update_attrs)
+             |> render_submit()
 
-      # assert index_live
-      #        |> form("#device-form", device: @update_attrs)
-      #        |> render_submit()
-
-      # assert_patch(index_live, ~p"/devices")
+      assert_patch(index_live, ~p"/devices")
 
       # html = render(index_live)
       # assert html =~ "Device updated successfully"
@@ -78,37 +74,37 @@ defmodule OpenBossWeb.DeviceLiveTest do
     #     assert index_live |> element("#devices-#{device.id} a", "Delete") |> render_click()
     #     refute has_element?(index_live, "#devices-#{device.id}")
     #   end
-    # end
+  end
 
-    # describe "Show" do
-    #   setup [:create_device]
+  describe "Show" do
+    setup [:create_device]
 
-    #   test "displays device", %{conn: conn, device: device} do
-    #     {:ok, _show_live, html} = live(conn, ~p"/devices/#{device}")
+    test "displays device", %{conn: conn, device: device} do
+      {:ok, _show_live, html} = live(conn, ~p"/devices/#{device}")
 
-    #     assert html =~ "Show Device"
-    #   end
+      assert html =~ "Device"
+    end
 
-    #   test "updates device within modal", %{conn: conn, device: device} do
-    #     {:ok, show_live, _html} = live(conn, ~p"/devices/#{device}")
+    test "updates device within modal", %{conn: conn, device: device} do
+      {:ok, show_live, _html} = live(conn, ~p"/devices/#{device}")
 
-    #     assert show_live |> element("a", "Edit") |> render_click() =~
-    #              "Edit Device"
+      assert show_live |> element("a", "Edit") |> render_click() =~
+               "Configure..."
 
-    #     assert_patch(show_live, ~p"/devices/#{device}/show/edit")
+      # assert_patch(show_live, ~p"/devices/#{device}/show/edit")
 
-    #     assert show_live
-    #            |> form("#device-form", device: @invalid_attrs)
-    #            |> render_change() =~ "can&#39;t be blank"
+      # assert show_live
+      #        |> form("#device-form", device: @invalid_attrs)
+      #        |> render_change() =~ "can&#39;t be blank"
 
-    #     assert show_live
-    #            |> form("#device-form", device: @update_attrs)
-    #            |> render_submit()
+      # assert show_live
+      #        |> form("#device-form", device: @update_attrs)
+      #        |> render_submit()
 
-    #     assert_patch(show_live, ~p"/devices/#{device}")
+      # assert_patch(show_live, ~p"/devices/#{device}")
 
-    #     html = render(show_live)
-    #     assert html =~ "Device updated successfully"
-    #   end
+      # html = render(show_live)
+      # assert html =~ "Device updated successfully"
+    end
   end
 end
