@@ -21,7 +21,7 @@ Urgent
 Not So Urgent
 
 - [ ] Reorganize documentation
-- [ ] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
+- [x] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
 - [ ] Support devices other than Egg Genius
 - [ ] Figure out "Raspberry Pi with Kiosk Mode"; separate project or embedded here?
 - [ ] Better github integration
