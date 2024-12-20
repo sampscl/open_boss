@@ -31,8 +31,10 @@ Not So Urgent
 
 ## Reverse Engineered Protocol
 
+- Devices self-identify on the network with mDNS as `_flameboss._tcp.local`
 - Send a HTTP GET request to `/switch` to cause the device to enter "Flame Boss Protocol"; it is currently unknown what this
   really does, but the iOS app does it and so shall Open Boss
+- MQTT is used as a pub/sub message bux
 - The MQTT topics are `flameboss/<DEVICE_SERIAL_NUMBER>/...`
 - Temperatures are degrees celsius \* 10, so 1489 is 148.9 degrees C
 - Temperature values range from -32767 to 32768
