@@ -13,6 +13,7 @@ config :open_boss,
 
 # Configure devices behavior
 config :open_boss, OpenBoss.Devices, list: :live
+config :open_boss, OpenBoss.Devices.Manager, enable_mqtt: true
 
 # Configure sqlite
 config :ecto_sqlite3,

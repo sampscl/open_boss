@@ -101,7 +101,12 @@ defmodule OpenBoss.Devices.Manager do
       ) do
     result =
       Ecto.Multi.new()
-      |> Ecto.Multi.run(:mqtt_pid, fn _repo, _changes -> Map.fetch(mqtt_pids, device_id) end)
+      |> Ecto.Multi.run(:mqtt_pid, fn _repo, _changes ->
+        case Map.get(mqtt_pids, device_id) do
+          nil -> {:error, :not_found}
+          pid -> {:ok, pid}
+        end
+      end)
       |> Ecto.Multi.run(:device, fn _repo, _changes ->
         if device = load_device(device_id) do
           Device.changeset(device, %{requested_temp: celsius}) |> Repo.update()
@@ -137,79 +142,15 @@ defmodule OpenBoss.Devices.Manager do
     {:reply, result, state}
   end
 
-  @impl GenServer
-  def handle_cast(
-        {:ensure_managed, %{domain: domain, ip: ip, port: port, services: _services}},
-        %{mqtt_pids: mqtt_pids, device_ids: device_ids} = state
-      ) do
-    device_id = domain_to_device_id(domain)
-
-    if _existing = Map.get(mqtt_pids, device_id) do
+  if Application.compile_env!(:open_boss, __MODULE__) |> Keyword.fetch!(:enable_mqtt) do
+    @impl GenServer
+    def handle_cast(msg, state) do
+      start_mqtt(msg, state)
+    end
+  else
+    @impl GenServer
+    def handle_cast(_msg, state) do
       {:noreply, state}
-    else
-      Logger.info("Starting MQTT for #{domain}")
-
-      ip_string = Tuple.to_list(ip) |> Enum.join(".")
-
-      # Get /switch to switch to "Flame Boss Protocol"; not sure what
-      # this is meant to do, but the iOS app does it and it seems
-      # harmless not to mimic that behavior. Sometimes when the device
-      # is working properly it does not return a HTTP/200 like it should,
-      # so the http result is not verified. If there's a real problem it
-      # will be detected below in the MQTT connection.
-      http_result =
-        :httpc.request(
-          :get,
-          {~c"http://#{ip_string}/switch", []},
-          [timeout: :timer.seconds(1)],
-          []
-        )
-
-      Logger.debug("GET /switch result: #{inspect(http_result, pretty: true)}")
-
-      client_id = "open-boss-#{UUID.uuid4()}"
-
-      Logger.debug("New client_id #{client_id}")
-
-      {:ok, mqtt_pid} =
-        :emqtt.start_link(
-          host: ip_string |> to_charlist(),
-          port: port,
-          clientid: to_charlist(client_id)
-        )
-
-      _ = Process.monitor(mqtt_pid)
-      _ = Process.unlink(mqtt_pid)
-
-      {:ok, _} = :emqtt.connect(mqtt_pid)
-      {:ok, _, _} = :emqtt.subscribe(mqtt_pid, "#")
-
-      Logger.info("Connected (#{client_id})")
-
-      {:ok, device} =
-        (load_device(device_id) || %Device{id: device_id})
-        |> Device.changeset(%{
-          id: device_id,
-          ip: ip_string,
-          port: port,
-          last_communication: DateTime.utc_now()
-        })
-        |> Repo.insert_or_update()
-
-      :ok =
-        Phoenix.PubSub.broadcast(
-          OpenBoss.PubSub,
-          "device-presence",
-          {:worker_start, device}
-        )
-
-      updated_state = %{
-        state
-        | mqtt_pids: Map.put(mqtt_pids, device_id, mqtt_pid),
-          device_ids: Map.put(device_ids, mqtt_pid, device_id)
-      }
-
-      {:noreply, updated_state}
     end
   end
 
@@ -289,13 +230,6 @@ defmodule OpenBoss.Devices.Manager do
       )
   end
 
-  @spec domain_to_device_id(String.t()) :: integer()
-  defp domain_to_device_id("fb-" <> id_and_suffix = _domain) do
-    String.split(id_and_suffix, ".", parts: 2)
-    |> List.first()
-    |> String.to_integer()
-  end
-
   # the erlang spec for :emqtt.ping/1 does not correctly
   # list the {:error, :ack_timeout} return, which
   # definitely happens in the real world so suppress
@@ -318,4 +252,86 @@ defmodule OpenBoss.Devices.Manager do
   @spec load_device(integer() | nil) :: Device.t() | nil
   defp load_device(nil), do: nil
   defp load_device(device_id), do: Repo.get(Device, device_id)
+
+  if Application.compile_env!(:open_boss, __MODULE__) |> Keyword.fetch!(:enable_mqtt) do
+    @spec start_mqtt({:ensure_managed, map()}, State.t()) :: {:noreply, State.t()}
+    defp start_mqtt(
+           {:ensure_managed,
+            %{domain: "fb-" <> id_and_suffix = domain, ip: ip, port: port, services: _services}},
+           %{mqtt_pids: mqtt_pids, device_ids: device_ids} = state
+         ) do
+      device_id =
+        String.split(id_and_suffix, ".", parts: 2)
+        |> List.first()
+        |> String.to_integer()
+
+      if _existing = Map.get(mqtt_pids, device_id) do
+        {:noreply, state}
+      else
+        Logger.info("Starting MQTT for #{domain}")
+
+        ip_string = Tuple.to_list(ip) |> Enum.join(".")
+
+        # Get /switch to switch to "Flame Boss Protocol"; not sure what
+        # this is meant to do, but the iOS app does it and it seems
+        # harmless not to mimic that behavior. Sometimes when the device
+        # is working properly it does not return a HTTP/200 like it should,
+        # so the http result is not verified. If there's a real problem it
+        # will be detected below in the MQTT connection.
+        http_result =
+          :httpc.request(
+            :get,
+            {~c"http://#{ip_string}/switch", []},
+            [timeout: :timer.seconds(1)],
+            []
+          )
+
+        Logger.debug("GET /switch result: #{inspect(http_result, pretty: true)}")
+
+        client_id = "open-boss-#{UUID.uuid4()}"
+
+        Logger.debug("New client_id #{client_id}")
+
+        {:ok, mqtt_pid} =
+          :emqtt.start_link(
+            host: ip_string |> to_charlist(),
+            port: port,
+            clientid: to_charlist(client_id)
+          )
+
+        _ = Process.monitor(mqtt_pid)
+        _ = Process.unlink(mqtt_pid)
+
+        {:ok, _} = :emqtt.connect(mqtt_pid)
+        {:ok, _, _} = :emqtt.subscribe(mqtt_pid, "#")
+
+        Logger.info("Connected (#{client_id})")
+
+        {:ok, device} =
+          (load_device(device_id) || %Device{id: device_id})
+          |> Device.changeset(%{
+            id: device_id,
+            ip: ip_string,
+            port: port,
+            last_communication: DateTime.utc_now()
+          })
+          |> Repo.insert_or_update()
+
+        :ok =
+          Phoenix.PubSub.broadcast(
+            OpenBoss.PubSub,
+            "device-presence",
+            {:worker_start, device}
+          )
+
+        updated_state = %{
+          state
+          | mqtt_pids: Map.put(mqtt_pids, device_id, mqtt_pid),
+            device_ids: Map.put(device_ids, mqtt_pid, device_id)
+        }
+
+        {:noreply, updated_state}
+      end
+    end
+  end
 end

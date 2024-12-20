@@ -86,8 +86,8 @@ defmodule OpenBoss.Devices.Device do
   def validate_temp(cs, %{min_temp: min, max_temp: max}, field)
       when not is_nil(min) and not is_nil(max) do
     cs
-    |> validate_number(field, greater_than_or_equal_to: min)
-    |> validate_number(field, less_than_or_equal_to: max)
+    |> validate_number(field, greater_than_or_equal_to: min, message: "must be >= #{min}C")
+    |> validate_number(field, less_than_or_equal_to: max, message: "must be <= #{max}C")
   end
 
   def validate_temp(cs, _, _), do: cs

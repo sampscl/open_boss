@@ -5,8 +5,8 @@ defmodule OpenBossWeb.DeviceLiveTest do
   import OpenBoss.DevicesFixtures
 
   # @create_attrs %{}
-  @update_attrs %{name: "a different name", set_temp: "100"}
-  @invalid_attrs %{set_temp: "0"}
+  @update_attrs %{"name" => "a different name", "set_temp" => "110"}
+  @invalid_attrs %{"set_temp" => "0"}
 
   defp create_device(_) do
     device = device_fixture()
@@ -22,28 +22,6 @@ defmodule OpenBossWeb.DeviceLiveTest do
       assert html =~ "fixture"
     end
 
-    #   test "saves new device", %{conn: conn} do
-    #     {:ok, index_live, _html} = live(conn, ~p"/devices")
-
-    #     assert index_live |> element("a", "New Device") |> render_click() =~
-    #              "New Device"
-
-    #     assert_patch(index_live, ~p"/devices/new")
-
-    #     assert index_live
-    #            |> form("#device-form", device: @invalid_attrs)
-    #            |> render_change() =~ "can&#39;t be blank"
-
-    #     assert index_live
-    #            |> form("#device-form", device: @create_attrs)
-    #            |> render_submit()
-
-    #     assert_patch(index_live, ~p"/devices")
-
-    #     html = render(index_live)
-    #     assert html =~ "Device created successfully"
-    #   end
-
     test "updates device in listing", %{conn: conn, device: device} do
       {:ok, index_live, _html} = live(conn, ~p"/devices")
 
@@ -52,11 +30,11 @@ defmodule OpenBossWeb.DeviceLiveTest do
              |> render_click() =~
                OpenBoss.Devices.Device.get_name(device)
 
-      assert_patch(index_live, ~p"/devices/#{device}/edit")
+      assert_patch(index_live, ~p"/devices/#{device.id}/edit")
 
-      # assert index_live
-      #        |> form("#device-form", device: @invalid_attrs)
-      #        |> render_change() =~ "is invalid"
+      assert index_live
+             |> form("#device-form", device: @invalid_attrs)
+             |> render_change() =~ "must be &gt;="
 
       assert index_live
              |> form("#device-form", device: @update_attrs)
@@ -64,16 +42,9 @@ defmodule OpenBossWeb.DeviceLiveTest do
 
       assert_patch(index_live, ~p"/devices")
 
-      # html = render(index_live)
-      # assert html =~ "Device updated successfully"
+      html = render(index_live)
+      assert html =~ "a different name updated successfully"
     end
-
-    #   test "deletes device in listing", %{conn: conn, device: device} do
-    #     {:ok, index_live, _html} = live(conn, ~p"/devices")
-
-    #     assert index_live |> element("#devices-#{device.id} a", "Delete") |> render_click()
-    #     refute has_element?(index_live, "#devices-#{device.id}")
-    #   end
   end
 
   describe "Show" do
@@ -88,23 +59,23 @@ defmodule OpenBossWeb.DeviceLiveTest do
     test "updates device within modal", %{conn: conn, device: device} do
       {:ok, show_live, _html} = live(conn, ~p"/devices/#{device}")
 
-      assert show_live |> element("a", "Edit") |> render_click() =~
+      assert show_live |> element("a", "Configure...") |> render_click() =~
                "Configure..."
 
-      # assert_patch(show_live, ~p"/devices/#{device}/show/edit")
+      assert_patch(show_live, ~p"/devices/#{device.id}/show/edit")
 
-      # assert show_live
-      #        |> form("#device-form", device: @invalid_attrs)
-      #        |> render_change() =~ "can&#39;t be blank"
+      assert show_live
+             |> form("#device-form", device: @invalid_attrs)
+             |> render_change() =~ "must be &gt;="
 
-      # assert show_live
-      #        |> form("#device-form", device: @update_attrs)
-      #        |> render_submit()
+      assert show_live
+             |> form("#device-form", device: @update_attrs)
+             |> render_submit()
 
-      # assert_patch(show_live, ~p"/devices/#{device}")
+      assert_patch(show_live, ~p"/devices/#{device.id}")
 
-      # html = render(show_live)
-      # assert html =~ "Device updated successfully"
+      html = render(show_live)
+      assert html =~ "a different name updated successfully"
     end
   end
 end

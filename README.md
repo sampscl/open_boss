@@ -13,9 +13,9 @@ be the device the author owns and used to reverse the MQTT protocol).
 
 Urgent
 
-- [ ] Fix existing tests
+- [x] Fix existing tests
 - [ ] Adjust the device code to be more testable and write tests
-- [ ] Tests for the phoenix-y parts
+- [x] Tests for the phoenix-y parts
 - [ ] Add the `Cooks` context
 
 Not So Urgent

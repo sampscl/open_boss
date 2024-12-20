@@ -53,7 +53,7 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
 
         {:noreply,
          socket
-         |> put_flash(:info, "Device #{Device.get_name(device)} updated successfully")
+         |> put_flash(:info, "#{Device.get_name(device)} updated successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
