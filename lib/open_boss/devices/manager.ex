@@ -109,12 +109,17 @@ defmodule OpenBoss.Devices.Manager do
       end)
       |> Ecto.Multi.run(:device, fn _repo, _changes ->
         if device = load_device(device_id) do
-          Device.changeset(device, %{requested_temp: celsius}) |> Repo.update()
+          {:ok, device}
         else
           {:error, :not_found}
         end
       end)
       |> Ecto.Multi.run(:mqtt_pub, fn _repo, %{mqtt_pid: mqtt_pid} ->
+        # This is not very transactional: you cannot un-publish. The worst
+        # that can happen is that subsequent steps fail but the device
+        # sets the requested temperature. Eventually the MQTT will let
+        # us know that the device set_temp has changed and the ui and
+        # db will get updated.
         :emqtt.publish(
           mqtt_pid,
           "flameboss/#{device_id}/recv",

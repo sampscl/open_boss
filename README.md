@@ -17,14 +17,17 @@ Urgent
 - [ ] Adjust the device code to be more testable and write tests
 - [x] Tests for the phoenix-y parts
 - [ ] Add the `Cooks` context
+- [ ] Alarm or alert system for when the time series device data diverges "too far"
 
 Not So Urgent
 
 - [ ] Reorganize documentation
+- [ ] UI alert for when a device's `set_temp` differs from `requested_temp`
 - [x] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
 - [ ] Support devices other than Egg Genius
 - [ ] Figure out "Raspberry Pi with Kiosk Mode"; separate project or embedded here?
 - [ ] Better github integration
+- [ ] UI graphs for time series device data
 
 ## Reverse Engineered Protocol
 
