@@ -9,7 +9,9 @@ defmodule OpenBoss.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases(),
+      default_release: :open_boss
     ]
   end
 
@@ -64,7 +66,8 @@ defmodule OpenBoss.MixProject do
       {:bandit, "~> 1.5"},
       {:uuid, "~> 1.0"},
       {:mdns, "~> 1.0"},
-      {:emqtt, github: "emqx/emqtt", tag: "1.13.5", system_env: [{"BUILD_WITHOUT_QUIC", "1"}]}
+      {:emqtt, github: "emqx/emqtt", tag: "1.13.5", system_env: [{"BUILD_WITHOUT_QUIC", "1"}]},
+      {:burrito, "~> 1.0"}
     ]
   end
 
@@ -86,6 +89,23 @@ defmodule OpenBoss.MixProject do
         "tailwind open_boss --minify",
         "esbuild open_boss --minify",
         "phx.digest"
+      ]
+    ]
+  end
+
+  defp releases do
+    [
+      open_boss: [],
+      open_boss_burrito: [
+        steps: [:assemble, &Burrito.wrap/1],
+        burrito: [
+          targets: [
+            macos_aarch64: [os: :darwin, cpu: :aarch64],
+            macos_x86_64: [os: :darwin, cpu: :x86_64],
+            linux_x86_64: [os: :linux, cpu: :x86_64],
+            linux_aarch64: [os: :linux, cpu: :aarch64]
+          ]
+        ]
       ]
     ]
   end

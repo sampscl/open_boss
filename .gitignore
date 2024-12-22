@@ -40,3 +40,6 @@ npm-debug.log
 
 # No database files
 priv/db/
+
+# No burrito output
+burrito_out/

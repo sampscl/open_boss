@@ -24,7 +24,7 @@ defmodule OpenBoss.Application do
     if File.exists?(dbpath) do
       Logger.debug("Database directory: #{dbpath}")
     else
-      raise(%File.Error{path: dbpath, reason: :enoent})
+      raise "database path does not exist: #{dbpath}"
     end
 
     children = [
