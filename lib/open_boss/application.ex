@@ -16,6 +16,17 @@ defmodule OpenBoss.Application do
       Logger.put_application_level(:emqtt, :info)
     end
 
+    dbpath =
+      Application.fetch_env!(:open_boss, OpenBoss.Repo)
+      |> Keyword.fetch!(:database)
+      |> Path.dirname()
+
+    if File.exists?(dbpath) do
+      Logger.debug("Database directory: #{dbpath}")
+    else
+      raise(%File.Error{path: dbpath, reason: :enoent})
+    end
+
     children = [
       {Ecto.Migrator, repos: Application.fetch_env!(:open_boss, :ecto_repos)},
       OpenBossWeb.Telemetry,

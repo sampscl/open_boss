@@ -16,14 +16,32 @@ import Config
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
-if System.get_env("PHX_SERVER") do
+if config_env() == :prod or is_binary(System.get_env("PHX_SERVER")) do
   config :open_boss, OpenBossWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
+  # Determine location of the database in prod
+  database =
+    with nil <- System.get_env("DB_DIR") do
+      case :os.type() do
+        {:unix, :darwin} ->
+          # macos
+          Path.expand("~/Library/Application Support/Open Boss/db.sqlite3")
+
+        {:unix, _} ->
+          # likely linux of some kind
+          "/var/lib/open_boss/db.sqlite3"
+
+        _unsupported ->
+          # windows probably, maybe others
+          raise "Unsupported Operating System"
+      end
+    end
+
   # Config database
   config :open_boss, OpenBoss.Repo,
-    database: System.fetch_env!("DB_DIR"),
+    database: database,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
@@ -43,31 +61,34 @@ if config_env() == :prod do
 
   config :open_boss, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :open_boss, OpenBossWeb.Endpoint,
-    url: [host: host, port: 443, scheme: "https"],
-    http: [
-      # Enable IPv6 and bind on all interfaces.
-      # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
-      # See the documentation on https://hexdocs.pm/bandit/Bandit.html#t:options/0
-      # for details about using IPv6 vs IPv4 and loopback vs public addresses.
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: port
-    ],
-    secret_key_base: secret_key_base
+  # config :open_boss, OpenBossWeb.Endpoint,
+  #   url: [host: host, port: 443, scheme: "https"],
+  #   http: [
+  #     # Enable IPv6 and bind on all interfaces.
+  #     # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
+  #     # See the documentation on https://hexdocs.pm/bandit/Bandit.html#t:options/0
+  #     # for details about using IPv6 vs IPv4 and loopback vs public addresses.
+  #     ip: {0, 0, 0, 0, 0, 0, 0, 0},
+  #     port: port
+  #   ],
+  #   secret_key_base: secret_key_base
 
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :open_boss, OpenBossWeb.Endpoint,
-  #       https: [
-  #         ...,
-  #         port: 443,
-  #         cipher_suite: :strong,
-  #         keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
-  #         certfile: System.get_env("SOME_APP_SSL_CERT_PATH")
-  #       ]
+  config :open_boss, OpenBossWeb.Endpoint,
+    url: [host: host, port: port, scheme: "https"],
+    https: [
+      ip: {0, 0, 0, 0},
+      port: 443,
+      cipher_suite: :strong,
+      keyfile: "priv/server_key.pem",
+      certfile: "priv/server_cert.pem"
+    ],
+    secret_key_base: secret_key_base
+
   #
   # The `cipher_suite` is set to `:strong` to support only the
   # latest and more secure SSL ciphers. This means old browsers

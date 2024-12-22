@@ -9,3 +9,6 @@ The format is baseed on [Keep a Changelog](https://keepachangelog.com/en/1.0.0)
 - Discover flame boss via mDNS
 - Basic MQTT device communication
 - Basic UI
+- Some basic tests
+- Elixir release
+- Some app branding/themeing

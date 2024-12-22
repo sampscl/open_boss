@@ -14,6 +14,7 @@ be the device the author owns and used to reverse the MQTT protocol).
 Urgent
 
 - [x] Fix existing tests
+- [x] Elixir release for the app
 - [ ] Adjust the device code to be more testable and write tests
 - [x] Tests for the phoenix-y parts
 - [ ] Add the `Cooks` context
@@ -22,6 +23,7 @@ Urgent
 Not So Urgent
 
 - [ ] Reorganize documentation
+- [ ] Some sort of automated installer or instructions
 - [ ] UI alert for when a device's `set_temp` differs from `requested_temp`
 - [x] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
 - [ ] Support devices other than Egg Genius
