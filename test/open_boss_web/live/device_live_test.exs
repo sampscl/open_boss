@@ -4,6 +4,8 @@ defmodule OpenBossWeb.DeviceLiveTest do
   import Phoenix.LiveViewTest
   import OpenBoss.DevicesFixtures
 
+  alias OpenBoss.Devices.Device
+
   # @create_attrs %{}
   @update_attrs %{"name" => "a different name", "set_temp" => "110"}
   @invalid_attrs %{"set_temp" => "0"}
@@ -28,7 +30,7 @@ defmodule OpenBossWeb.DeviceLiveTest do
       assert index_live
              |> element("#devices-#{device.id} a", "Configure...")
              |> render_click() =~
-               OpenBoss.Devices.Device.get_name(device)
+               Device.get_name(device)
 
       assert_patch(index_live, ~p"/devices/#{device.id}/edit")
 

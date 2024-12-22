@@ -4,6 +4,8 @@ defmodule OpenBoss.DevicesFixtures do
   entities via the `OpenBoss.Devices` context.
   """
 
+  alias OpenBoss.Devices.Device
+
   @doc """
   Generate a device.
   """
@@ -49,7 +51,7 @@ defmodule OpenBoss.DevicesFixtures do
       )
 
     {:ok, device} =
-      OpenBoss.Devices.Device.changeset(%OpenBoss.Devices.Device{}, params)
+      Device.changeset(%Device{}, params)
       |> OpenBoss.Repo.insert()
 
     device
