@@ -8,12 +8,13 @@ defmodule OpenBoss.Cooks.Cook do
   alias OpenBoss.Devices.Device
 
   @required_fields [:name, :start_time]
-  @fields @required_fields ++ [:device_id, :stop_time, :device_id]
+  @fields @required_fields ++ [:device_id, :stop_time, :device_id, :notes]
 
   schema "cooks" do
     field(:name, :string)
     field(:start_time, :utc_datetime_usec)
     field(:stop_time, :utc_datetime_usec)
+    field(:notes, :string)
     belongs_to(:device, Device)
   end
 

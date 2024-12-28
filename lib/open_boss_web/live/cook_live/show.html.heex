@@ -31,6 +31,10 @@
     {if @cook.stop_time && @timezone,
       do: OpenBoss.Utils.dt_to_browser_time_string(@cook.stop_time, @timezone)}
   </:item>
+
+  <:item title="Notes">
+    {@cook.notes}
+  </:item>
 </.list>
 
 <.back navigate={~p"/cooks"}>Back to cooks</.back>

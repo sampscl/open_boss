@@ -81,6 +81,17 @@
       <% end %>
     </div>
 
+    <div class="field">
+      <label for="cook_notes">Notes</label>
+      <.input type="textarea" name="cook[notes]" id="cook_notes" value={@form[:notes].value} />
+      <%= if @form.errors[:notes] do %>
+        <span class="error">
+          {{msg, _} = @form.errors[:notes]
+          msg}
+        </span>
+      <% end %>
+    </div>
+
     <:actions>
       <.button phx-disable-with="Saving...">Save Cook</.button>
     </:actions>
