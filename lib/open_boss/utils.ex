@@ -22,7 +22,9 @@ defmodule OpenBoss.Utils do
     "#{celsius_to_farenheit(celsius) |> round()}\u00b0F / #{round(celsius)}\u00b0C"
   end
 
-  @spec browser_time_to_dt(String.t(), String.t()) :: DateTime.t()
+  @spec browser_time_to_dt(String.t(), String.t()) :: DateTime.t() | nil
+  def browser_time_to_dt("", _timezone), do: nil
+
   def browser_time_to_dt(time, timezone) do
     NaiveDateTime.from_iso8601!(time <> ":00Z") |> DateTime.from_naive!(timezone)
   end

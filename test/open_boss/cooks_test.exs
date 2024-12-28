@@ -14,7 +14,7 @@ defmodule OpenBoss.CooksTest do
     @invalid_attrs %{name: nil}
 
     test "list_cooks/0 returns all cooks" do
-      cook = cook_fixture()
+      cook = cook_fixture() |> Repo.preload([:device])
       assert Cooks.list_cooks() == [cook]
     end
 
