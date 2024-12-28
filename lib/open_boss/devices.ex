@@ -28,7 +28,7 @@ defmodule OpenBoss.Devices do
       Get a list of all devices, active and inactive
       """
       @spec list() :: list(Device.t())
-      def list, do: OpenBoss.Repo.all(Device)
+      def list, do: list_all()
 
       @doc """
       Get most current state of a given device
@@ -42,6 +42,12 @@ defmodule OpenBoss.Devices do
         end
       end
   end
+
+  @doc """
+  List all devices, online or offline
+  """
+  @spec list_all() :: list(Device.t())
+  def list_all, do: OpenBoss.Repo.all(Device)
 
   @doc """
   Set device desired temp. The device must be online.

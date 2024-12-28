@@ -1,0 +1,63 @@
+<.header>
+  Cooks
+  <:actions>
+    <.link patch={~p"/cooks/new"}>
+      <.button>New Cook</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<div id="timezone-hook" phx-hook="Timezone" />
+
+<.table
+  id="cooks"
+  rows={@streams.cooks}
+  row_click={fn {_id, cook} -> JS.navigate(~p"/cooks/#{cook.id}") end}
+>
+  <:action :let={{_id, cook}}>
+    <div class="sr-only">
+      <.link navigate={~p"/cooks/#{cook.id}"}>Show</.link>
+    </div>
+    <.link patch={~p"/cooks/#{cook.id}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, cook}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: cook.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+
+  <:col :let={{_id, cook}} label="Name">
+    {cook.name}
+  </:col>
+
+  <:col :let={{_id, cook}} label="Device">
+    {if nil == cook.device_id do
+      "Unassigned"
+    else
+      OpenBoss.Devices.Device.get_name(cook.device)
+    end}
+  </:col>
+
+  <:col :let={{_id, cook}} label="Dates">
+    {if cook.stop_time do
+      "#{OpenBoss.Utils.dt_to_browser_time_string(cook.start_time, @timezone)} - #{OpenBoss.Utils.dt_to_browser_time_string(cook.stop_time, @timezone)}"
+    else
+      "#{OpenBoss.Utils.dt_to_browser_time_string(cook.start_time, @timezone)} (in progress)"
+    end}
+  </:col>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="cook-modal" show on_cancel={JS.patch(~p"/cooks")}>
+  <.live_component
+    module={OpenBossWeb.CookLive.FormComponent}
+    id={@cook.id || :new}
+    title={@page_title}
+    action={@live_action}
+    cook={@cook}
+    timezone={@timezone}
+    patch={~p"/cooks"}
+  />
+</.modal>

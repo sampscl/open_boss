@@ -598,6 +598,26 @@ defmodule OpenBossWeb.CoreComponents do
     """
   end
 
+  @doc """
+  Hidden to set a value to the browser's timezone
+  """
+  attr :id, :any, default: "timezone"
+  attr :name, :any, default: "timezone"
+
+  attr :field, Phoenix.HTML.FormField,
+    doc: "a form field struct retrieved from the form, for example: @form[:email]"
+
+  def timezone(assigns) do
+    assigns =
+      assigns
+      |> assign(id: get_in(assigns, [Access.key(:field), Access.key(:id)]) || assigns.id)
+      |> assign(name: get_in(assigns, [Access.key(:field), Access.key(:name)]) || assigns.name)
+
+    ~H"""
+    <input type="hidden" name={@name} id={@id} phx-update="ignore" phx-hook="Timezone" />
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

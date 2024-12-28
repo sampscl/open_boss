@@ -17,7 +17,7 @@
         type="number"
         name="device[set_temp]"
         id="device_set_temp"
-        value={OpenBoss.Utils.celsius_to_farenheit(@device.set_temp) |> round()}
+        value={OpenBoss.Utils.celsius_to_farenheit(@form[:set_temp].value) |> round()}
       />
       <%= if @form.errors[:set_temp] do %>
         <span class="error">
@@ -29,7 +29,7 @@
 
     <div class="field">
       <label for="device_name">Name</label>
-      <.input type="text" name="device[name]" id="device_name" value={@device.name} />
+      <.input type="text" name="device[name]" id="device_name" value={@form[:name].value} />
       <%= if @form.errors[:name] do %>
         <span class="error">
           {{msg, _} = @form.errors[:name]

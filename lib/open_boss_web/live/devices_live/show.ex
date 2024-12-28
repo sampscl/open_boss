@@ -7,14 +7,20 @@ defmodule OpenBossWeb.DevicesLive.Show do
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
-    with {:error, :not_found} <- String.to_integer(id) |> Devices.device_state(),
-         do: raise(OpenBossWeb.DevicesLive.DeviceIdNotFoundError)
+    case String.to_integer(id) |> Devices.device_state() do
+      {:error, :not_found} ->
+        {:ok,
+         socket
+         |> put_flash(:error, "Device #{id} not active")
+         |> push_navigate(to: ~p"/devices")}
 
-    if connected?(socket) do
-      :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, "device-state-#{id}")
+      {:ok, _device} ->
+        if connected?(socket) do
+          :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, "device-state-#{id}")
+        end
+
+        {:ok, socket}
     end
-
-    {:ok, socket}
   end
 
   @impl true

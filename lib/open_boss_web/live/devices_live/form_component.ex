@@ -5,8 +5,6 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
   alias OpenBoss.Devices.Manager
   alias OpenBoss.Repo
 
-  require Logger
-
   @impl true
   def update(%{device: device} = assigns, socket) do
     {:ok,

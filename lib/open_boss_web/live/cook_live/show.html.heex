@@ -1,0 +1,48 @@
+<.header>
+  {@cook.name}
+  <:actions>
+    <.link patch={~p"/cooks/#{@cook}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit cook</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<div id="timezone-hook" phx-hook="Timezone" />
+
+<.list>
+  <:item title="Name">
+    {@cook.name}
+  </:item>
+
+  <:item title="Device">
+    {if nil == @cook.device_id do
+      "Unassigned"
+    else
+      OpenBoss.Devices.Device.get_name(@cook.device)
+    end}
+  </:item>
+
+  <:item title="Start Time">
+    {if @cook.start_time && @timezone,
+      do: OpenBoss.Utils.dt_to_browser_time_string(@cook.start_time, @timezone)}
+  </:item>
+
+  <:item title="Stop Time">
+    {if @cook.stop_time && @timezone,
+      do: OpenBoss.Utils.dt_to_browser_time_string(@cook.stop_time, @timezone)}
+  </:item>
+</.list>
+
+<.back navigate={~p"/cooks"}>Back to cooks</.back>
+
+<.modal :if={@live_action == :edit} id="cook-modal" show on_cancel={JS.patch(~p"/cooks/#{@cook}")}>
+  <.live_component
+    module={OpenBossWeb.CookLive.FormComponent}
+    id={@cook.id}
+    title={@page_title}
+    action={@live_action}
+    cook={@cook}
+    timezone={@timezone}
+    patch={~p"/cooks/#{@cook}"}
+  />
+</.modal>

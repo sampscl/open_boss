@@ -1,0 +1,88 @@
+<div>
+  <.header>
+    {@title}
+    <:subtitle>Manage Cooks</:subtitle>
+  </.header>
+
+  <.simple_form
+    for={@form}
+    id="cook-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
+  >
+    <div class="field">
+      <label for="cook_name">Name</label>
+      <.input type="text" name="cook[name]" id="cook_name" value={@form[:name].value} />
+      <%= if @form.errors[:name] do %>
+        <span class="error">
+          {{msg, _} = @form.errors[:name]
+          msg}
+        </span>
+      <% end %>
+    </div>
+
+    <div class="field">
+      <label for="cook_device">Device</label>
+      <.input
+        type="select"
+        name="cook[device_id]"
+        id="cook_device"
+        value={@form[:device_id].value}
+        options={
+          Enum.map(@devices, fn device ->
+            {OpenBoss.Devices.Device.get_name(device), device.id}
+          end)
+        }
+      />
+      <%= if @form.errors[:device_id] do %>
+        <span class="error">
+          {{msg, _} = @form.errors[:device_id]
+          msg}
+        </span>
+      <% end %>
+    </div>
+
+    <div class="field">
+      <label for="cook_start_time">Start Time</label>
+      <.input
+        type="datetime-local"
+        name="cook[start_time]"
+        id="cook_start_time"
+        value={
+          if @form[:start_time].value && @timezone,
+            do: OpenBoss.Utils.dt_to_browser_time(@form[:start_time].value, @timezone)
+        }
+      />
+      <%= if @form.errors[:start_time] do %>
+        <span class="error">
+          {{msg, _} = @form.errors[:start_time]
+          msg}
+        </span>
+      <% end %>
+    </div>
+
+    <div class="field">
+      <label for="cook_stop_time">Stop Time</label>
+      <.input
+        type="datetime-local"
+        name="cook[stop_time]"
+        id="cook_stop_time"
+        value={
+          if @form[:stop_time].value && @timezone,
+            do: OpenBoss.Utils.dt_to_browser_time(@form[:stop_time].value, @timezone)
+        }
+      />
+      <%= if @form.errors[:stop_time] do %>
+        <span class="error">
+          {{msg, _} = @form.errors[:stop_time]
+          msg}
+        </span>
+      <% end %>
+    </div>
+
+    <:actions>
+      <.button phx-disable-with="Saving...">Save Cook</.button>
+    </:actions>
+  </.simple_form>
+</div>

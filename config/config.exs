@@ -15,6 +15,9 @@ config :open_boss,
 config :open_boss, OpenBoss.Devices, list: :live
 config :open_boss, OpenBoss.Devices.Manager, enable_mqtt: true
 
+# Configure timezone support
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Configure sqlite
 config :ecto_sqlite3,
   binary_id_type: :binary,

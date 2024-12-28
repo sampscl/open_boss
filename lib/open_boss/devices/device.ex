@@ -6,6 +6,7 @@ defmodule OpenBoss.Devices.Device do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias OpenBoss.Cooks.Cook
   alias OpenBoss.Devices.Temps
 
   @type t() :: %__MODULE__{}
@@ -66,6 +67,7 @@ defmodule OpenBoss.Devices.Device do
     field(:wifi_version, :string)
     field(:name, :string)
     field(:last_communication, :utc_datetime_usec)
+    has_many(:cooks, Cook, on_delete: :nilify_all)
     timestamps(type: :utc_datetime)
   end
 

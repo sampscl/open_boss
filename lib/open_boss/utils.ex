@@ -21,4 +21,21 @@ defmodule OpenBoss.Utils do
   def display_temp(celsius) do
     "#{celsius_to_farenheit(celsius) |> round()}\u00b0F / #{round(celsius)}\u00b0C"
   end
+
+  @spec browser_time_to_dt(String.t(), String.t()) :: DateTime.t()
+  def browser_time_to_dt(time, timezone) do
+    NaiveDateTime.from_iso8601!(time <> ":00Z") |> DateTime.from_naive!(timezone)
+  end
+
+  @spec dt_to_browser_time(DateTime.t(), String.t()) :: NaiveDateTime.t()
+  def dt_to_browser_time(dt, browser_timezone) do
+    DateTime.shift_zone!(dt, browser_timezone) |> DateTime.to_naive()
+  end
+
+  @spec dt_to_browser_time_string(DateTime.t(), String.t()) :: String.t()
+  def dt_to_browser_time_string(dt, browser_timezone) do
+    dt_to_browser_time(dt, browser_timezone)
+    |> NaiveDateTime.truncate(:second)
+    |> NaiveDateTime.to_string()
+  end
 end

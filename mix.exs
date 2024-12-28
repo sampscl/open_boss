@@ -36,7 +36,7 @@ defmodule OpenBoss.MixProject do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:phoenix, "~> 1.7.14"},
+      {:phoenix, "~> 1.7"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
       {:ecto_sqlite3, ">= 0.0.0"},
@@ -66,6 +66,7 @@ defmodule OpenBoss.MixProject do
       {:bandit, "~> 1.5"},
       {:uuid, "~> 1.0"},
       {:mdns, "~> 1.0"},
+      {:tzdata, "~> 1.1"},
       {:emqtt, github: "emqx/emqtt", tag: "1.13.5", system_env: [{"BUILD_WITHOUT_QUIC", "1"}]},
       {:burrito, "~> 1.0"}
     ]
