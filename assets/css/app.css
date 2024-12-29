@@ -4,8 +4,7 @@
 
 /* This file is for your main application CSS */
 .bg-custom-artwork {
-  /* background-image: url('/images/open_boss_embossed.png'); */
-  background-image: url('/images/open_boss.png');
+  background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('/images/open_boss.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

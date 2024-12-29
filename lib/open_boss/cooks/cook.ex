@@ -10,6 +10,8 @@ defmodule OpenBoss.Cooks.Cook do
   @required_fields [:name, :start_time]
   @fields @required_fields ++ [:device_id, :stop_time, :device_id, :notes]
 
+  @type t() :: %__MODULE__{}
+
   schema "cooks" do
     field(:name, :string)
     field(:start_time, :utc_datetime_usec)

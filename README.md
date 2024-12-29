@@ -24,6 +24,7 @@ Urgent
 Not So Urgent
 
 - [ ] Reorganize documentation
+- [ ] Stop Cook button for quick, common, change to a cook
 - [ ] Virtual field in devices to support offline/online flag
 - [ ] Some sort of automated installer or instructions
 - [x] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"

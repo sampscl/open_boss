@@ -6,11 +6,13 @@
       Manage your devices and cooks
     </p>
   </div>
+  <div id="timezone-hook" phx-hook="Timezone" />
   <div class="mt-8 z-10 w-full">
-    {live_render(@conn, OpenBossWeb.ActiveCookLive.EmbeddedView,
-      router: OpenBossWeb.Router,
-      id: "active-cooks-live"
-    )}
+    <.table id="active_cooks" rows={@streams.active_cooks}>
+      <:col :let={{_id, cook}} label="Cook">
+        {cook.name} on {OpenBoss.Devices.Device.get_name(cook.device)}
+      </:col>
+    </.table>
   </div>
   <div class="absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;"></div>
 </main>
