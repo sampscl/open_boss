@@ -1,7 +1,7 @@
 <.header>
   Device {OpenBoss.Devices.Device.get_name(@device)}
   <:subtitle>
-    {"Last updated #{Calendar.strftime(@device.updated_at, "%Y-%m-%d %I:%M:%S %p %Z")}"}
+    {"Last updated #{@relative_time_string}"}
   </:subtitle>
   <:actions>
     <.link patch={~p"/devices/#{@device.id}/show/edit"} phx-click={JS.push_focus()}>

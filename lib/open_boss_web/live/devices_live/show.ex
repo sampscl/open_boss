@@ -16,6 +16,7 @@ defmodule OpenBossWeb.DevicesLive.Show do
 
       {:ok, _device} ->
         if connected?(socket) do
+          _ = send(self(), :staleness_check)
           :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, "device-state-#{id}")
         end
 
@@ -32,6 +33,7 @@ defmodule OpenBossWeb.DevicesLive.Show do
         {:noreply,
          socket
          |> assign(:page_title, page_title(socket.assigns.live_action))
+         |> assign(:relative_time_string, "")
          |> assign(:device, device_state)}
 
       {:error, :not_found} ->
@@ -47,6 +49,16 @@ defmodule OpenBossWeb.DevicesLive.Show do
   @impl true
   def handle_info({OpenBossWeb.DevicesLive.FormComponent, {:saved, device}}, socket) do
     {:noreply, assign(socket, :device, device)}
+  end
+
+  @impl true
+  def handle_info(:staleness_check, socket) do
+    _ = Process.send_after(self(), :staleness_check, :timer.seconds(15))
+
+    {
+      :noreply,
+      assign(socket, :relative_time_string, Timex.from_now(socket.assigns.device.updated_at))
+    }
   end
 
   defp page_title(:show), do: "Device"

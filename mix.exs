@@ -68,6 +68,7 @@ defmodule OpenBoss.MixProject do
       {:mdns, "~> 1.0"},
       {:tzdata, "~> 1.1"},
       {:emqtt, github: "emqx/emqtt", tag: "1.13.5", system_env: [{"BUILD_WITHOUT_QUIC", "1"}]},
+      {:timex, "~> 3.7"},
       {:burrito, "~> 1.0"}
     ]
   end

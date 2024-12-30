@@ -16,9 +16,10 @@ Urgent
 - [x] Fix existing tests
 - [x] Elixir release for the app
 - [ ] Adjust the device code to be more testable and write tests
-- [ ] UI timer for "last updated xxx ago..."
+- [x] UI timer for "last updated xxx ago..."
 - [x] Tests for the phoenix-y parts
 - [x] Add the `Cooks` context
+- [ ] Time series data for cooks
 - [ ] Alarm or alert system for when the time series device data diverges "too far"
 
 Not So Urgent

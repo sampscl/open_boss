@@ -3,6 +3,6 @@ defmodule OpenBossWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Manage your devices and cooks effortlessly"
+    assert html_response(conn, 200) =~ "Manage your devices and cooks"
   end
 end

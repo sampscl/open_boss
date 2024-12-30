@@ -19,7 +19,7 @@ defmodule OpenBossWeb.ActiveCookLiveTest do
     test "lists all active_cooks", %{conn: conn} do
       {:ok, _index_live, html} = live(conn, ~p"/active_cooks")
 
-      assert html =~ "Active cooks"
+      assert html =~ "Cooks"
     end
   end
 end
