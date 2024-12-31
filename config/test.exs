@@ -11,7 +11,7 @@ config :open_boss, OpenBoss.Devices.Manager, enable_mqtt: false
 # Run `mix help test` for more information.
 # Set database file
 config :open_boss, OpenBoss.Repo,
-  database: "priv/db/watering_can_test",
+  database: "priv/db/open_boss_test.sqlite3",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 

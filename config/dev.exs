@@ -1,7 +1,7 @@
 import Config
 
 # Set database file
-config :open_boss, OpenBoss.Repo, database: "priv/db/watering_can_dev"
+config :open_boss, OpenBoss.Repo, database: "priv/db/open_boss_dev.sqlite3"
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
