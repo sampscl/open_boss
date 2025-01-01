@@ -218,7 +218,7 @@ defmodule OpenBoss.Devices.Manager do
         |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now()})
         |> Repo.update()
 
-      :ok = ActiveCooks.maybe_add_cook_history(updated_device)
+      _ = ActiveCooks.maybe_add_cook_history(updated_device)
 
       :ok = pub_device_state!(updated_device)
     else
