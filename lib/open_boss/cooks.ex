@@ -4,6 +4,7 @@ defmodule OpenBoss.Cooks do
   """
 
   import Ecto.Query, warn: false
+  alias OpenBoss.Cooks.CookHistory
   alias OpenBoss.Repo
 
   alias OpenBoss.Cooks.Cook
@@ -50,9 +51,12 @@ defmodule OpenBoss.Cooks do
 
   """
   def create_cook(attrs \\ %{}) do
-    %Cook{}
-    |> Cook.changeset(attrs)
-    |> Repo.insert()
+    with {:ok, cook} <-
+           %Cook{}
+           |> Cook.changeset(attrs)
+           |> Repo.insert() do
+      {:ok, Repo.preload(cook, :device)}
+    end
   end
 
   @doc """
@@ -93,6 +97,16 @@ defmodule OpenBoss.Cooks do
   """
   def delete_cook(%Cook{} = cook) do
     Repo.delete(cook)
+  end
+
+  @doc """
+  Purge a cook: remove history and the cook
+  """
+  def purge_cook(%Cook{} = cook) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.delete_all(:cook_history, from(c in CookHistory, where: c.cook_id == ^cook.id))
+    |> Ecto.Multi.delete(:cook, cook)
+    |> Repo.transaction()
   end
 
   @doc """

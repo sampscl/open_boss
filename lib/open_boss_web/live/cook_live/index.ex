@@ -53,7 +53,7 @@ defmodule OpenBossWeb.CookLive.Index do
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     cook = Cooks.get_cook!(id)
-    {:ok, _} = Cooks.delete_cook(cook)
+    {:ok, _} = Cooks.purge_cook(cook)
 
     {:noreply, stream_delete(socket, :cooks, cook)}
   end

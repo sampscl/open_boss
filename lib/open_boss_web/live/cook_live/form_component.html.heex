@@ -29,6 +29,7 @@
         name="cook[device_id]"
         id="cook_device"
         value={@form[:device_id].value}
+        disabled={@action == :edit}
         options={
           Enum.map(@devices, fn device ->
             {OpenBoss.Devices.Device.get_name(device), device.id}
