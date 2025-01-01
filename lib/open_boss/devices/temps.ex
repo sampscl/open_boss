@@ -16,6 +16,8 @@ defmodule OpenBoss.Devices.Temps do
           meat_2: float() | nil
         }
 
+  @derive {Jason.Encoder, only: @fields}
+
   schema "temps" do
     field(:pit_1, :float)
     field(:meat_1, :float)

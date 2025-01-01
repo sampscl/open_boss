@@ -92,5 +92,54 @@ defmodule OpenBoss.CooksTest do
       cook = cook_fixture(%{device_id: device.id})
       assert %Device{} = Cooks.get_cook!(cook.id).device
     end
+
+    test "multiple completed cooks assigned to single device" do
+      device = device_fixture()
+
+      _cook =
+        cook_fixture(%{
+          device_id: device.id,
+          start_time: ~U[2024-12-31 00:00:00Z],
+          stop_time: ~U[2024-12-31 01:00:00Z]
+        })
+
+      _cook =
+        cook_fixture(%{
+          device_id: device.id,
+          start_time: ~U[2024-12-31 00:00:00Z],
+          stop_time: nil
+        })
+
+      assert {:ok, _cook2} =
+               Cooks.create_cook(%{
+                 name: "some other cook",
+                 device_id: device.id,
+                 start_time: ~U[2024-12-31 01:00:00Z],
+                 stop_time: ~U[2024-12-31 01:00:00Z]
+               })
+    end
+
+    test "same device cannot have 2 active cooks" do
+      device = device_fixture()
+
+      _cook =
+        cook_fixture(%{
+          device_id: device.id,
+          start_time: ~U[2024-12-31 00:00:00Z],
+          stop_time: nil
+        })
+
+      assert {:error, cs} =
+               Cooks.create_cook(%{
+                 name: "some other cook",
+                 device_id: device.id,
+                 start_time: ~U[2024-12-31 01:00:00Z],
+                 stop_time: nil
+               })
+
+      assert {"only 1 active cook allowed per device",
+              [constraint: :unique, constraint_name: "cooks_device_id_index"]} =
+               Keyword.fetch!(cs.errors, :device)
+    end
   end
 end

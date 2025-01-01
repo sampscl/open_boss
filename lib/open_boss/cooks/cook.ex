@@ -5,6 +5,7 @@ defmodule OpenBoss.Cooks.Cook do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias OpenBoss.Cooks.CookHistory
   alias OpenBoss.Devices.Device
 
   @required_fields [:name, :start_time]
@@ -18,6 +19,7 @@ defmodule OpenBoss.Cooks.Cook do
     field(:stop_time, :utc_datetime_usec)
     field(:notes, :string)
     belongs_to(:device, Device)
+    has_many(:cook_history, CookHistory)
   end
 
   @doc false
@@ -26,6 +28,14 @@ defmodule OpenBoss.Cooks.Cook do
     |> cast(attrs, @fields)
     |> validate_required(@required_fields)
     |> validate_cook_times()
+    # the constraint name is *wrong* but that's the constraint error that
+    # ecto raises, there are some comments in the elixir-sqlite repo regarding
+    # this sort of problem:
+    # https://github.com/elixir-sqlite/ecto_sqlite3/blob/main/lib/ecto/adapters/sqlite3.ex#L173-L189
+    |> unique_constraint(:device,
+      name: "cooks_device_id_index",
+      message: "only 1 active cook allowed per device"
+    )
   end
 
   @spec validate_cook_times(Ecto.Changeset.t()) :: Ecto.Changeset.t()

@@ -8,6 +8,7 @@ be the device the author owns and used to reverse the MQTT protocol).
 
 - Discovery of Flame Boss devices on the local network via mDNS
 - Basic control of Egg Genius, maybe others like the Flame Boss 400
+- Cook tracking and history
 
 ## TODO
 
@@ -19,7 +20,7 @@ Urgent
 - [x] UI timer for "last updated xxx ago..."
 - [x] Tests for the phoenix-y parts
 - [x] Add the `Cooks` context
-- [ ] Time series data for cooks
+- [x] Time series data for cooks
 - [ ] Alarm or alert system for when the time series device data diverges "too far"
 
 Not So Urgent

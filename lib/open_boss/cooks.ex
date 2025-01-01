@@ -74,7 +74,13 @@ defmodule OpenBoss.Cooks do
   end
 
   @doc """
-  Deletes a cook.
+  Deletes a cook. This will raise `Ecto.ConstraintError`
+  if the cook has history. Delete those first, then
+  delete the cook instead. Note that a constraint can
+  be handled with in a changeset, but this does not
+  work properly for sqlite.
+
+  See also the comments in `OpenBoss.Cooks.Cook.changeset/2`.
 
   ## Examples
 

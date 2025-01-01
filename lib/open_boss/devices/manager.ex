@@ -9,6 +9,7 @@ defmodule OpenBoss.Devices.Manager do
 
   import Ecto.Query
 
+  alias OpenBoss.ActiveCooks
   alias OpenBoss.Devices
   alias OpenBoss.Devices.Device
   alias OpenBoss.Devices.Payload
@@ -217,6 +218,8 @@ defmodule OpenBoss.Devices.Manager do
         |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now()})
         |> Repo.update()
 
+      :ok = ActiveCooks.maybe_add_cook_history(updated_device)
+
       :ok = pub_device_state!(updated_device)
     else
       Logger.warning("Got message for unknown pid: #{inspect(msg)}")
@@ -231,6 +234,13 @@ defmodule OpenBoss.Devices.Manager do
       Phoenix.PubSub.broadcast!(
         OpenBoss.PubSub,
         "device-state-#{device.id}",
+        {:device_state, device}
+      )
+
+    :ok =
+      Phoenix.PubSub.broadcast!(
+        OpenBoss.PubSub,
+        "device-state-all",
         {:device_state, device}
       )
   end
