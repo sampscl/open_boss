@@ -236,13 +236,6 @@ defmodule OpenBoss.Devices.Manager do
         "device-state-#{device.id}",
         {:device_state, device}
       )
-
-    :ok =
-      Phoenix.PubSub.broadcast!(
-        OpenBoss.PubSub,
-        "device-state-all",
-        {:device_state, device}
-      )
   end
 
   # the erlang spec for :emqtt.ping/1 does not correctly
