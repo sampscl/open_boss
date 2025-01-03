@@ -19,7 +19,8 @@ defmodule OpenBossWeb.CookLive.Show do
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:cook, Cooks.get_cook!(id))}
+     |> assign(:cook, Cooks.get_cook!(id))
+     |> assign(:cook_history, Cooks.get_cook_history_for_id(id))}
   end
 
   defp page_title(:show), do: "Show Cook"

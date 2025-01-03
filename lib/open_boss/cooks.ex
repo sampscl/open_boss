@@ -121,4 +121,12 @@ defmodule OpenBoss.Cooks do
   def change_cook(%Cook{} = cook, attrs \\ %{}) do
     Cook.changeset(cook, attrs)
   end
+
+  @doc """
+  Get a all history for a cook
+  """
+  def get_cook_history_for_id(cook_id) do
+    from(h in CookHistory, where: h.cook_id == ^cook_id)
+    |> Repo.all()
+  end
 end

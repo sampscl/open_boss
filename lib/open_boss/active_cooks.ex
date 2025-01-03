@@ -19,7 +19,8 @@ defmodule OpenBoss.ActiveCooks do
       from(c in Cook,
         where: c.device_id == ^device_id,
         where: c.start_time <= ^at_time,
-        where: is_nil(c.stop_time) or c.stop_time >= ^at_time
+        where: is_nil(c.stop_time) or c.stop_time >= ^at_time,
+        preload: :device
       )
     )
   end

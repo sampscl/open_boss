@@ -23,9 +23,11 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 
 import TimezoneHook from "./hooks/timezone_hook"
+import CookChartHook from "./hooks/cook_chart_hook"
 
 let Hooks = {
-  Timezone: TimezoneHook
+  Timezone: TimezoneHook,
+  CookChart: CookChartHook
 }
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")

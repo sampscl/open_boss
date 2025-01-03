@@ -32,6 +32,26 @@
       do: OpenBoss.Utils.dt_to_browser_time_string(@cook.stop_time, @timezone)}
   </:item>
 
+  <:item title="History">
+    <canvas
+      id={"history-chart-#{@cook.id}"}
+      phx-hook="CookChart"
+      data={
+        Enum.map(@cook_history, fn item ->
+          Map.merge(
+            item.device_state,
+            %{
+              timestamp: item.timestamp
+            }
+          )
+        end)
+        |> Jason.encode!()
+      }
+      class="h-24 w-48"
+    >
+    </canvas>
+  </:item>
+
   <:item title="Notes">
     {@cook.notes}
   </:item>
