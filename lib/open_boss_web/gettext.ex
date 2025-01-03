@@ -20,5 +20,5 @@ defmodule OpenBossWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :open_boss
+  use Gettext.Backend, otp_app: :open_boss
 end

@@ -43,7 +43,7 @@ defmodule OpenBossWeb do
         layouts: [html: OpenBossWeb.Layouts]
 
       import Plug.Conn
-      import OpenBossWeb.Gettext
+      use Gettext, backend: MyApp.Gettext
 
       unquote(verified_routes())
     end
@@ -85,7 +85,7 @@ defmodule OpenBossWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import OpenBossWeb.CoreComponents
-      import OpenBossWeb.Gettext
+      use Gettext, backend: MyApp.Gettext
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS

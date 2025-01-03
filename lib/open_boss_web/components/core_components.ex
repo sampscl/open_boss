@@ -18,7 +18,7 @@ defmodule OpenBossWeb.CoreComponents do
 
   alias Phoenix.HTML.Form
   alias Phoenix.LiveView.JS
-  import OpenBossWeb.Gettext
+  use Gettext, backend: OpenBossWeb.Gettext
 
   @doc """
   Renders a modal.
