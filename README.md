@@ -86,10 +86,11 @@ Urgent
 Not So Urgent
 
 - [ ] Reorganize documentation
+- [ ] Cross-platform docker image builds
 - [ ] Docker registry for pre-built images
 - [ ] Stop Cook button for quick, common, change to a cook
 - [ ] Virtual field in devices to support offline/online flag
-- [ ] Some sort of automated installer or instructions
+- [x] Some sort of automated installer or instructions
 - [x] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
 - [ ] Support devices other than Egg Genius
 - [ ] Figure out "Raspberry Pi with Kiosk Mode"; separate project or embedded here?
