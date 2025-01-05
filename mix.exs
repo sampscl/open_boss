@@ -11,7 +11,8 @@ defmodule OpenBoss.MixProject do
       aliases: aliases(),
       deps: deps(),
       releases: releases(),
-      default_release: :open_boss
+      default_release: :open_boss,
+      dialyzer: [plt_add_apps: [:mix]]
     ]
   end
 

@@ -10,8 +10,6 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
       System.cmd("docker", [
         "buildx",
         "build",
-        # TODO set up cross platform image generation,
-        # does not work for mysterious reasons now
         # "--platform",
         # "linux/amd64,linux/arm64",
         ".",
