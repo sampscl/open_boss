@@ -1,0 +1,12 @@
+[Unit]
+Description=Docker compose %i service
+PartOf=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory=/etc/docker/compose/%i
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
+
+[Install]
+WantedBy=multi-user.target

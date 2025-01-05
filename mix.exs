@@ -21,7 +21,7 @@ defmodule OpenBoss.MixProject do
   def application do
     [
       mod: {OpenBoss.Application, []},
-      extra_applications: [:logger, :runtime_tools, :os_mon]
+      extra_applications: [:logger, :inets, :runtime_tools, :os_mon]
     ]
   end
 
@@ -69,7 +69,8 @@ defmodule OpenBoss.MixProject do
       {:tzdata, "~> 1.1"},
       {:emqtt, github: "emqx/emqtt", tag: "1.13.5", system_env: [{"BUILD_WITHOUT_QUIC", "1"}]},
       {:timex, "~> 3.7"},
-      {:burrito, "~> 1.0"}
+      {:burrito, "~> 1.0"},
+      {:x509, "~> 0.8"}
     ]
   end
 

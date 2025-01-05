@@ -84,8 +84,8 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0},
       port: 443,
       cipher_suite: :strong,
-      keyfile: "priv/server_key.pem",
-      certfile: "priv/server_cert.pem"
+      keyfile: System.fetch_env!("KEYFILE"),
+      certfile: System.fetch_env!("CERTFILE")
     ],
     secret_key_base: secret_key_base
 

@@ -10,6 +10,66 @@ be the device the author owns and used to reverse the MQTT protocol).
 - Basic control of Egg Genius, maybe others like the Flame Boss 400
 - Cook tracking and history
 
+## Installation
+
+### Keys and certs (all platforms)
+
+If you do not have your own server keys and certs, OpenBoss can generate self-signed ones. If you
+plan on exposing your OpenBoss server to the world (or to friends and family) and don't want them
+dealing with "this website is not trusted" warnings in their browsers, you should get real certs
+or show your tech-savvy crowd how to trust the root CA generated here. That's all beyond the scope
+of this README, so here's how to make self-signed ones:
+
+```shell
+ROOT_CA_SUBJECT_RDN='/C=AU/ST=NSW/L=Sydney/O=PhilipShermanDentistry/CN="P. Sherman Root CA"' \
+SUBJECT_RDN='/C=AU/ST=NSW/L=Sydney/O=PhilipShermanDentistry/CN="P. Sherman"' \
+SUBJECT_AN=`hostname` \
+  mix open_boss.build_self_signed_keys
+```
+
+### Systemd and Docker (e.g. Ubuntu)
+
+1. Set up [developmenmt](#Development) environmnent as pre-built images are not (yet) available
+2. Install [docker](https://www.docker.com) for your OS; the Docker Desktop is not necessary, only Docker Engine
+3. Install javascript packages
+
+```shell
+cd assets
+npm install
+cd ..
+```
+
+4. Copy self-signed certificates and keys and install them; if you have your own keys and certs, use them here
+
+```shell
+sudo cp -v etc/ssl/certs/*.pem /etc/ssl/certs/
+sudo cp -v etc/ssl/private/*.pem /etc/ssl/private/
+```
+
+5. Create docker compose file; if you used your own certs or set a different `SUBJECT_AN`, change `PHX_HOST`
+
+```shell
+PHX_HOST=`hostname` mix open_boss.build_compose
+sudo mkdir -p /etc/docker/compose/open_boss
+sudo cp -v etc/docker/compose/open_boss/docker-compose.yml /etc/docker/compose/open_boss
+```
+
+6. Build a OpenBoss docker image; be patient, this takes a few minutes
+
+```shell
+mix open_boss.build_image
+```
+
+7. Configure the service
+
+```shell
+sudo cp -v etc/systemd/system/docker-compose@.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now docker-compose@open_boss.service
+# tail the logs for a few minutes to make sure things start up, ctrl-c to exit:
+sudo journalctl -exfu docker-compose@open_boss.service
+```
+
 ## TODO
 
 Urgent
@@ -26,6 +86,7 @@ Urgent
 Not So Urgent
 
 - [ ] Reorganize documentation
+- [ ] Docker registry for pre-built images
 - [ ] Stop Cook button for quick, common, change to a cook
 - [ ] Virtual field in devices to support offline/online flag
 - [ ] Some sort of automated installer or instructions
@@ -34,6 +95,43 @@ Not So Urgent
 - [ ] Figure out "Raspberry Pi with Kiosk Mode"; separate project or embedded here?
 - [x] Better github integration
 - [ ] UI graphs for time series device data
+
+## Development
+
+1. Clone [OpenBoss](https://github.com/sampscl/open_boss.git).
+2. Install the [ASDF](https://asdf-vm.com/guide/getting-started.html) version manager
+3. Install tool dependencies
+
+- Homebrew
+
+```shell
+# Note: if you are on MacOS, you will need XCode or gcc also
+brew install openssl ncurses
+```
+
+- Ubuntu & other Debian-derived (incl. Raspberry PI OS)
+
+```shell
+sudo apt-get install -y build-essential make autoconf libssl-dev libncurses-dev
+```
+
+4. Add plugins for ASDF and install the tools:
+
+```shell
+cd open_boss
+asdf plugin-add elixir
+asdf plugin-add erlang
+asdf plugin-add zig
+asdf plugin-add nodejs
+asdf install
+```
+
+5. Get deps and make sure tests run successfully
+
+```shell
+mix deps.get
+mix test
+```
 
 ## Reverse Engineered Protocol
 

@@ -43,3 +43,10 @@ priv/db/
 
 # No burrito output
 burrito_out/
+
+# no certs
+etc/ssl/certs/
+etc/ssl/private/
+
+# no docker compose
+etc/docker/compose/open_boss/
