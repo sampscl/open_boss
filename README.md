@@ -4,6 +4,14 @@ An open source [licensed](LICENSE.txt) Elixir application to control Flame Boss
 and white labeled Flame Boss controllers like the Egg Genius (which happens to
 be the device the author owns and used to reverse the MQTT protocol).
 
+OpenBoss works by running software on the same network as the Flame Boss device(s),
+discovering them using mDNS, and connecting to each using MQTT. Internet connectivity
+is not required. OpenBoss presents a web-based interface to control the devices, manage
+"cooks" (a session of cooking food, not a fleet of people cooking things in a kitchen),
+and provide feedback regarding cooking progress. It is lightweight, requiring very
+little CPU and typically < 100MB of memory, making Raspberry PI or BeagleBone viable
+host platforms. It should run on any system capable of running Erlang.
+
 ## What Works Today
 
 - Discovery of Flame Boss devices on the local network via mDNS
@@ -27,6 +35,8 @@ SUBJECT_AN=`hostname` \
   mix open_boss.build_self_signed_keys
 ```
 
+Do the above after setting up your development environment.
+
 ### Systemd and Docker (e.g. Ubuntu)
 
 1. Set up [developmenmt](#Development) environmnent as pre-built images are not (yet) available
@@ -46,7 +56,10 @@ sudo cp -v etc/ssl/certs/*.pem /etc/ssl/certs/
 sudo cp -v etc/ssl/private/*.pem /etc/ssl/private/
 ```
 
-5. Create docker compose file; if you used your own certs or set a different `SUBJECT_AN`, change `PHX_HOST`
+5. Create docker compose file
+
+- If you used your own certs or set a different `SUBJECT_AN`, change `PHX_HOST`
+- The default compose file works with the self-signed cert process, but may need tweaking if you brought your own certs
 
 ```shell
 PHX_HOST=`hostname` mix open_boss.build_compose
