@@ -22,12 +22,6 @@ config :open_boss, OpenBossWeb.Endpoint,
   secret_key_base: "EhTPKEZs5RnuE+Rx7NP61EmVfCNNAv8ybqs9OftepkMsITVrUELgKXmtCVbbL9vT",
   server: false
 
-# In test we don't send emails
-config :open_boss, OpenBoss.Mailer, adapter: Swoosh.Adapters.Test
-
-# Disable swoosh api client as it is only required for production adapters
-config :swoosh, :api_client, false
-
 # Print only warnings and errors during test
 config :logger, level: :warning
 

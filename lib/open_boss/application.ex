@@ -33,8 +33,6 @@ defmodule OpenBoss.Application do
       OpenBoss.Repo,
       {DNSCluster, query: Application.get_env(:open_boss, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: OpenBoss.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: OpenBoss.Finch},
       # Start a worker by calling: OpenBoss.Worker.start_link(arg)
       # {OpenBoss.Worker, arg},
       {Task.Supervisor, name: OpenBoss.TaskSupervisor},
