@@ -17,7 +17,8 @@ defmodule OpenBossWeb.Router do
   scope "/", OpenBossWeb do
     pipe_through :browser
 
-    # get "/", PageController, :home
+    live "/", ActiveCookLive.Home, :home
+
     live "/devices", DevicesLive.Index, :index
     live "/devices/:id/edit", DevicesLive.Index, :edit
     live "/devices/:id", DevicesLive.Show, :show
@@ -28,9 +29,6 @@ defmodule OpenBossWeb.Router do
     live "/cooks/:id/edit", CookLive.Index, :edit
     live "/cooks/:id", CookLive.Show, :show
     live "/cooks/:id/show/edit", CookLive.Show, :edit
-
-    live "/active_cooks", ActiveCookLive.Index, :index
-    live "/", ActiveCookLive.Home, :home
   end
 
   # Other scopes may use custom stacks.

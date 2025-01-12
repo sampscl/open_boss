@@ -13,11 +13,11 @@ defmodule OpenBossWeb.ActiveCookLiveTest do
     %{active_cook: active_cook}
   end
 
-  describe "Index" do
+  describe "Home" do
     setup [:create_active_cook]
 
     test "lists all active_cooks", %{conn: conn} do
-      {:ok, _index_live, html} = live(conn, ~p"/active_cooks")
+      {:ok, _index_live, html} = live(conn, ~p"/")
 
       assert html =~ "Cooks"
     end
