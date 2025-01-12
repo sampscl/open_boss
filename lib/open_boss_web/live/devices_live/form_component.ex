@@ -4,6 +4,7 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
   alias OpenBoss.Devices.Device
   alias OpenBoss.Devices.Manager
   alias OpenBoss.Repo
+  alias OpenBoss.Utils
 
   @impl true
   def update(%{device: device} = assigns, socket) do
@@ -17,6 +18,7 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"device" => device_params}, socket) do
+    device_params = adjust_device_for_save(device_params)
     changeset = Device.changeset(socket.assigns.device, device_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
@@ -60,4 +62,12 @@ defmodule OpenBossWeb.DevicesLive.FormComponent do
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
+
+  @spec adjust_device_for_save(map()) :: map()
+  defp adjust_device_for_save(device_state) do
+    Map.update!(device_state, "set_temp", fn farenheit ->
+      {val, _} = Float.parse(farenheit)
+      Utils.farenheit_to_celsius(val)
+    end)
+  end
 end
