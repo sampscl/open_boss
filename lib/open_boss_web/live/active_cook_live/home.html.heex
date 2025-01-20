@@ -9,7 +9,7 @@
   <div class="mt-8 z-10 w-full">
     <.table
       id="active_cooks"
-      rows={@streams.active_cooks}
+      rows={@active_cooks}
       row_click={fn {_id, cook} -> JS.navigate(~p"/cooks/#{cook.id}/history") end}
     >
       <:action :let={{_id, cook}}>

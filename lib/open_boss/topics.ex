@@ -21,4 +21,14 @@ defmodule OpenBoss.Topics do
   """
   @spec device_state(integer()) :: Phoenix.PubSub.topic()
   def device_state(device_id), do: "device-state-#{device_id}"
+
+  @doc """
+  Active cook update channel. This is used when the device
+  assigned to a cook gets an updated device state.
+
+  Active cook update:
+  - `{:active_cook, %OpenBoss.Cooks.Cook{}}
+  """
+  @spec active_cook_update() :: Phoenix.PubSub.topic()
+  def active_cook_update, do: "active-cook-update"
 end

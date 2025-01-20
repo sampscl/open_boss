@@ -219,9 +219,16 @@ defmodule OpenBoss.Devices.Manager do
         |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now()})
         |> Repo.update()
 
-      _ = ActiveCooks.maybe_add_cook_history(updated_device)
-
       :ok = pub_device_state!(updated_device)
+
+      with {:ok, %{cook: active_cook}} <- ActiveCooks.maybe_add_cook_history(updated_device) do
+        :ok =
+          Phoenix.PubSub.broadcast!(
+            OpenBoss.PubSub,
+            Topics.active_cook_update(),
+            {:active_cook, active_cook}
+          )
+      end
     else
       Logger.warning("Got message for unknown pid: #{inspect(msg)}")
     end
