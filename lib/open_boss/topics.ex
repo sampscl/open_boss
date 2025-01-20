@@ -10,7 +10,7 @@ defmodule OpenBoss.Topics do
   - `{:worker_start, %OpenBoss.Devices.Device{}}`
   - `{:worker_lost, %OpenBoss.Devices.Device{}}`
   """
-  @spec device_presence() :: String.t()
+  @spec device_presence() :: Phoenix.PubSub.topic()
   def device_presence, do: "device-presence"
 
   @doc """
@@ -19,6 +19,6 @@ defmodule OpenBoss.Topics do
   Devices state:
   - `{:device_state, %OpenBoss.Devices.Device{}}`
   """
-  @spec device_state(integer()) :: String.t()
+  @spec device_state(integer()) :: Phoenix.PubSub.topic()
   def device_state(device_id), do: "device-state-#{device_id}"
 end
