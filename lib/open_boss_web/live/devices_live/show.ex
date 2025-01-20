@@ -4,6 +4,7 @@ defmodule OpenBossWeb.DevicesLive.Show do
   require Logger
 
   alias OpenBoss.Devices
+  alias OpenBoss.Topics
 
   @impl true
   def mount(%{"id" => id}, _session, socket) do
@@ -17,7 +18,7 @@ defmodule OpenBossWeb.DevicesLive.Show do
       {:ok, _device} ->
         if connected?(socket) do
           _ = send(self(), :staleness_check)
-          :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, "device-state-#{id}")
+          :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, Topics.device_state(id))
         end
 
         {:ok, socket}

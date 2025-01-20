@@ -29,6 +29,7 @@ defmodule OpenBossWeb.Router do
     live "/cooks/:id/edit", CookLive.Index, :edit
     live "/cooks/:id", CookLive.Show, :show
     live "/cooks/:id/show/edit", CookLive.Show, :edit
+    live "/cooks/:id/history", CookLive.History, :history
   end
 
   # Other scopes may use custom stacks.

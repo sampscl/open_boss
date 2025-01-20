@@ -7,9 +7,30 @@
   </div>
   <div id="timezone-hook" phx-hook="Timezone" />
   <div class="mt-8 z-10 w-full">
-    <.table id="active_cooks" rows={@streams.active_cooks}>
-      <:col :let={{_id, cook}} label="Cook">
+    <.table
+      id="active_cooks"
+      rows={@streams.active_cooks}
+      row_click={fn {_id, cook} -> JS.navigate(~p"/cooks/#{cook.id}/history") end}
+    >
+      <:action :let={{_id, cook}}>
+        <div class="sr-only">
+          <.link navigate={~p"/cooks/#{cook.id}/history"}>History</.link>
+        </div>
+      </:action>
+      <:action :let={{id, cook}}>
+        <.link
+          phx-click={JS.push("finish", value: %{id: cook.id}) |> hide("##{id}")}
+          data-confirm="Are you sure?"
+        >
+          Finish Cook
+        </.link>
+      </:action>
+
+      <:col :let={{_id, cook}} label="Active Cook">
         {cook.name} on {OpenBoss.Devices.Device.get_name(cook.device)}
+      </:col>
+      <:col :let={{_id, cook}} label="Started">
+        {OpenBoss.Utils.dt_to_browser_time_string(cook.start_time, @timezone)}
       </:col>
     </.table>
   </div>

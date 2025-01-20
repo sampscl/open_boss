@@ -14,6 +14,7 @@ defmodule OpenBoss.Devices.Manager do
   alias OpenBoss.Devices.Device
   alias OpenBoss.Devices.Payload
   alias OpenBoss.Repo
+  alias OpenBoss.Topics
 
   @type init_param() :: %{
           ip: :inet.socket_address(),
@@ -189,7 +190,7 @@ defmodule OpenBoss.Devices.Manager do
       :ok =
         Phoenix.PubSub.broadcast(
           OpenBoss.PubSub,
-          "device-presence",
+          Topics.device_presence(),
           {:worker_lost, device}
         )
 
@@ -233,7 +234,7 @@ defmodule OpenBoss.Devices.Manager do
     :ok =
       Phoenix.PubSub.broadcast!(
         OpenBoss.PubSub,
-        "device-state-#{device.id}",
+        Topics.device_state(device.id),
         {:device_state, device}
       )
   end
@@ -328,7 +329,7 @@ defmodule OpenBoss.Devices.Manager do
         :ok =
           Phoenix.PubSub.broadcast(
             OpenBoss.PubSub,
-            "device-presence",
+            Topics.device_presence(),
             {:worker_start, device}
           )
 

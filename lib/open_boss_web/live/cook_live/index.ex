@@ -1,6 +1,8 @@
 defmodule OpenBossWeb.CookLive.Index do
   use OpenBossWeb, :live_view
 
+  use Gettext, backend: OpenBossWeb.Gettext
+
   alias OpenBoss.Cooks
   alias OpenBoss.Cooks.Cook
 

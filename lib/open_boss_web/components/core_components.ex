@@ -572,6 +572,31 @@ defmodule OpenBossWeb.CoreComponents do
   end
 
   @doc """
+    Renders a browser back navigation link.
+
+    ## Examples
+
+        <.browser_back>Back</.browser_back>
+  """
+  slot :inner_block, required: true
+
+  def browser_back(assigns) do
+    ~H"""
+    <div class="mt-16">
+      <.link
+        href="#"
+        phx-click={JS.dispatch("click", to: "#")}
+        onclick="history.back(); return false;"
+        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+      >
+        <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
+        {render_slot(@inner_block)}
+      </.link>
+    </div>
+    """
+  end
+
+  @doc """
   Renders a [Heroicon](https://heroicons.com).
 
   Heroicons come in three styles – outline, solid, and mini.

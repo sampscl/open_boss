@@ -1,0 +1,26 @@
+<.header>
+  {@cook.name}
+</.header>
+
+<div id="timezone-hook" phx-hook="Timezone" />
+
+<div class="w-full h-full">
+  <canvas
+    id={"history-chart-#{@cook.id}"}
+    phx-hook="CookChart"
+    dataset={
+      Enum.map(@cook_history, fn item ->
+        item.device_state
+        |> Map.put("timestamp", item.timestamp)
+        |> Map.update!("set_temp", &OpenBoss.Utils.celsius_to_farenheit/1)
+        |> update_in(["temps", "pit_1"], &OpenBoss.Utils.celsius_to_farenheit/1)
+        |> update_in(["temps", "pit_2"], &OpenBoss.Utils.celsius_to_farenheit/1)
+        |> update_in(["temps", "meat_1"], &OpenBoss.Utils.celsius_to_farenheit/1)
+        |> update_in(["temps", "meat_2"], &OpenBoss.Utils.celsius_to_farenheit/1)
+      end)
+      |> Jason.encode!()
+    }
+  >
+  </canvas>
+</div>
+<.browser_back>Go Back</.browser_back>

@@ -28,28 +28,17 @@
   </:item>
 
   <:item title="Stop Time">
-    {if @cook.stop_time && @timezone,
-      do: OpenBoss.Utils.dt_to_browser_time_string(@cook.stop_time, @timezone)}
+    {cond do
+      @cook.stop_time == nil -> gettext("In Progress")
+      @timezone == nil -> gettext("Missing Timezone")
+      true -> OpenBoss.Utils.dt_to_browser_time_string(@cook.stop_time, @timezone)
+    end}
   </:item>
 
   <:item title="History">
-    <canvas
-      id={"history-chart-#{@cook.id}"}
-      phx-hook="CookChart"
-      data={
-        Enum.map(@cook_history, fn item ->
-          Map.merge(
-            item.device_state,
-            %{
-              timestamp: item.timestamp
-            }
-          )
-        end)
-        |> Jason.encode!()
-      }
-      class="h-24 w-48"
-    >
-    </canvas>
+    <.link navigate={~p"/cooks/#{@cook}/history"}>
+      <.button>View History</.button>
+    </.link>
   </:item>
 
   <:item title="Notes">

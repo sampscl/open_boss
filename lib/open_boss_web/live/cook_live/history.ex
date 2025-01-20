@@ -1,9 +1,8 @@
-defmodule OpenBossWeb.CookLive.Show do
+defmodule OpenBossWeb.CookLive.History do
   use OpenBossWeb, :live_view
 
-  use Gettext, backend: OpenBossWeb.Gettext
-
   alias OpenBoss.Cooks
+  require Logger
 
   @impl true
   def mount(_params, _session, socket) do
@@ -19,11 +18,8 @@ defmodule OpenBossWeb.CookLive.Show do
   def handle_params(%{"id" => id}, _, socket) do
     {:noreply,
      socket
-     |> assign(:page_title, page_title(socket.assigns.live_action))
+     |> assign(:page_title, "Cook History")
      |> assign(:cook, Cooks.get_cook!(id))
      |> assign(:cook_history, Cooks.get_cook_history_for_id(id))}
   end
-
-  defp page_title(:show), do: "Show Cook"
-  defp page_title(:edit), do: "Edit Cook"
 end

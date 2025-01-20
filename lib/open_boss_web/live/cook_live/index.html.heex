@@ -45,7 +45,7 @@
     {if cook.stop_time do
       "#{OpenBoss.Utils.dt_to_browser_time_string(cook.start_time, @timezone)} - #{OpenBoss.Utils.dt_to_browser_time_string(cook.stop_time, @timezone)}"
     else
-      "#{OpenBoss.Utils.dt_to_browser_time_string(cook.start_time, @timezone)} (in progress)"
+      "#{OpenBoss.Utils.dt_to_browser_time_string(cook.start_time, @timezone)} (#{gettext("In Progress")})"
     end}
   </:col>
 </.table>
