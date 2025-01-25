@@ -4,7 +4,7 @@
 
 Urgent
 
-- [ ] Installation system for mortals
+- [ ] Installation system for less technical users
 - [x] Bug in history live chart that causes re-rendering artifacts
 - [x] Fix existing tests
 - [x] Elixir release for the app
