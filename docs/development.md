@@ -5,7 +5,7 @@
 Urgent
 
 - [ ] Installation system for mortals
-- [ ] Bug in history live chart that causes re-rendering artifacts
+- [x] Bug in history live chart that causes re-rendering artifacts
 - [x] Fix existing tests
 - [x] Elixir release for the app
 - [ ] Adjust the device code to be more testable and write tests

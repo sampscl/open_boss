@@ -8,6 +8,8 @@
   <canvas
     id={"history-chart-#{@cook.id}"}
     phx-hook="CookChart"
+    phx-update="replace"
+    data-chart-id={@cook.id}
     dataset={
       Enum.map(@cook_history, fn item ->
         item.device_state
