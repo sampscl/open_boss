@@ -45,10 +45,10 @@ defmodule OpenBoss.ActiveCooks do
 
   @doc """
   If device has a cook for the device.last_communication,
-  update the cook history for that cook with a snapshot of
-  the device.
+  add a new cook history record for that cook with a
+  snapshot of the device.
 
-  This will update cooks that are no longer active.
+  This can update cooks that are no longer active.
   """
   @spec maybe_add_cook_history(Device.t()) :: {:ok, any()} | {:error, any()}
   def maybe_add_cook_history(device) do
@@ -66,9 +66,16 @@ defmodule OpenBoss.ActiveCooks do
       end
     end)
     |> Ecto.Multi.insert(:cook_history, fn %{cook: cook} ->
-      device_state =
-        Map.from_struct(device)
-        |> Map.take([:set_temp, :temps, :blower])
+      device_state = %{
+        set_temp: device.set_temp,
+        blower: device.blower,
+        temps: %{
+          pit_1: device.temps.pit_1,
+          pit_2: device.temps.pit_2,
+          meat_1: device.temps.meat_1,
+          meat_2: device.temps.meat_2
+        }
+      }
 
       CookHistory.changeset(%CookHistory{}, %{
         cook_id: cook.id,

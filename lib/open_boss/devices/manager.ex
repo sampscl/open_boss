@@ -221,12 +221,12 @@ defmodule OpenBoss.Devices.Manager do
 
       :ok = pub_device_state!(updated_device)
 
-      with {:ok, %{cook: active_cook}} <- ActiveCooks.maybe_add_cook_history(updated_device) do
+      with {:ok, %{cook: cook}} <- ActiveCooks.maybe_add_cook_history(updated_device) do
         :ok =
           Phoenix.PubSub.broadcast!(
             OpenBoss.PubSub,
             Topics.active_cook_update(),
-            {:active_cook, active_cook}
+            {:active_cook, Repo.preload(cook, :cook_history)}
           )
       end
     else

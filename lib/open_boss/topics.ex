@@ -24,7 +24,8 @@ defmodule OpenBoss.Topics do
 
   @doc """
   Active cook update channel. This is used when the device
-  assigned to a cook gets an updated device state.
+  assigned to a cook gets an updated device state. The
+  published cook will have the complete history loaded.
 
   Active cook update:
   - `{:active_cook, %OpenBoss.Cooks.Cook{}}

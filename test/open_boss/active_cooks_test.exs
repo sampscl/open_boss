@@ -76,6 +76,7 @@ defmodule OpenBoss.ActiveCooksTest do
         })
 
       assert {:ok, %{cook_history: cook_history}} = ActiveCooks.maybe_add_cook_history(device)
+
       assert cook_history.timestamp == device.last_communication
       assert cook_history.device_state.set_temp == 107.3
       assert cook_history.device_state.blower == 0.0
