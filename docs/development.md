@@ -28,7 +28,7 @@ Not So Urgent
 - [x] Better github integration
 - [x] UI graphs for time series device data
 
-## Development
+## Development Environment
 
 1. Clone [OpenBoss](https://github.com/sampscl/open_boss.git).
 2. Install the [ASDF](https://asdf-vm.com/guide/getting-started.html) version manager
@@ -41,7 +41,7 @@ Not So Urgent
 brew install openssl ncurses
 ```
 
-- Ubuntu & other Debian-derived (incl. Raspberry PI OS)
+- Ubuntu & other Debian-derived (incl. Raspberry Pi OS)
 
 ```shell
 sudo apt-get install -y build-essential make autoconf libssl-dev libncurses-dev
@@ -69,11 +69,11 @@ mix test
 
 - Devices self-identify on the network with mDNS as `_flameboss._tcp.local`
 - Send a HTTP GET request to `/switch` to cause the device to enter "Flame Boss Protocol"; it is currently unknown what this
-  really does, but the iOS app does it and so shall Open Boss
+  really does, but the official iOS app does it and so shall Open Boss
 - MQTT is used as a pub/sub message bus
 - The MQTT topics are `flameboss/<DEVICE_SERIAL_NUMBER>/...`
 - Temperatures are degrees celsius \* 10, so 1489 is 148.9 degrees C
-- Temperature values range from -32767 to 32768
+- Temperature values range from -32767 to 32768 so it's probably a 16-bit integer
 - Blower values are percentage \* 100, so 10000 is 100%
 - Publish to `flameboss/<DEVICE_SERIAL_NUMBER>/recv`
 - Receive from `flameboss/<DEVICE_SERIAL_NUMBER>/send`, though there are other active topics

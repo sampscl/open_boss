@@ -6,7 +6,7 @@ If you do not have your own server keys and certs, OpenBoss can generate self-si
 plan on exposing your OpenBoss server to the world (or to friends and family) and don't want them
 dealing with "this website is not trusted" warnings in their browsers, you should get real certs
 or show your tech-savvy crowd how to trust the root CA generated here. That's all beyond the scope
-of this README, so here's how to make self-signed ones:
+of this README, so set up your development environment and here's how to make self-signed ones:
 
 ```shell
 ROOT_CA_SUBJECT_RDN='/C=AU/ST=NSW/L=Sydney/O=PhilipShermanDentistry/CN="P. Sherman Root CA"' \
@@ -15,11 +15,9 @@ SUBJECT_AN=`hostname` \
   mix open_boss.build_self_signed_keys
 ```
 
-Do the above after setting up your development environment.
-
 ## Systemd and Docker (e.g. Ubuntu)
 
-1. Set up [developmenmt](#Development) environmnent as pre-built images are not (yet) available
+1. Set up [developmenmt](./development.md#development-environment) environmnent as pre-built images are not (yet) available
 2. Install [docker](https://www.docker.com) for your OS; the Docker Desktop is not necessary, only Docker Engine
 3. Install javascript packages
 
