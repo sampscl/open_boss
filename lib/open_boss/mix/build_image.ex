@@ -9,7 +9,7 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
     {_result, 0} = System.cmd("npm", ["install"], cd: "assets")
 
     build_result =
-      case System.get_env("PLAFORMS", nil) do
+      case System.get_env("PLATFORMS", nil) do
         nil ->
           System.cmd("docker", [
             "buildx",
