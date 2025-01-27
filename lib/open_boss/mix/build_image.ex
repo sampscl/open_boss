@@ -8,17 +8,34 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
   def run(_) do
     {_result, 0} = System.cmd("npm", ["install"], cd: "assets")
 
-    {_result, 0} =
-      System.cmd("docker", [
-        "buildx",
-        "build",
-        # "--platform",
-        # "linux/arm64,linux/amd64",
-        ".",
-        "--tag",
-        "open_boss:latest"
-      ])
+    build_result =
+      case System.get_env("PLAFORMS", nil) do
+        nil ->
+          System.cmd("docker", [
+            "build",
+            ".",
+            "--tag",
+            "open_boss:latest"
+          ])
 
-    Mix.shell().info("Generated docker image")
+        platforms ->
+          System.cmd("docker", [
+            "buildx",
+            "build",
+            "--platform",
+            platforms,
+            ".",
+            "--tag",
+            "open_boss:latest"
+          ])
+      end
+
+    case build_result do
+      {_result, 0} ->
+        Mix.shell().info("Generated docker image")
+
+      {result, status} ->
+        Mix.shell().info("Failed to build docker image. Error #{status}, result: " <> result)
+    end
   end
 end
