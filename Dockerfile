@@ -2,6 +2,9 @@ FROM hexpm/elixir:1.17.3-erlang-27.1.3-alpine-3.21.0 AS builder
 
 ENV MIX_ENV=prod
 ENV APP_NAME=open_boss
+# Thank you tme_317! (https://elixirforum.com/t/cant-compile-elixir-phoenix-api-in-docker-build-step/56863/7)
+# Workaround QEMU JIT issue building AMD64 on ARM64
+ENV ERL_FLAGS="+JPperf true"
 
 RUN apk update && \
   apk add --no-cache \
