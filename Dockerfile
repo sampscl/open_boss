@@ -16,6 +16,7 @@ RUN rm -rf _build deps
 
 RUN mix local.hex --force
 RUN mix local.rebar --force
+RUN mix clean
 RUN mix deps.get
 RUN mix assets.deploy
 RUN mix release
@@ -34,4 +35,4 @@ RUN apk update && \
 
 WORKDIR /app
 COPY --from=builder /app/_build/${MIX_ENV}/rel/open_boss /app
-CMD /app/bin/${APP_NAME} start
+CMD ["/app/bin/${APP_NAME}",  "start"]
