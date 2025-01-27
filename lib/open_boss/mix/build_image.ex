@@ -16,7 +16,7 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
             "build",
             ".",
             "--output",
-            "type=docker"
+            "type=docker",
             "--tag",
             "open_boss:latest"
           ])
@@ -29,7 +29,7 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
             platforms,
             ".",
             "--output",
-            "type=docker"
+            "type=docker",
             "--tag",
             "open_boss:latest"
           ])
