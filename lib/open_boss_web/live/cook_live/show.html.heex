@@ -46,6 +46,8 @@
   </:item>
 </.list>
 
+<div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
+
 <.back navigate={~p"/cooks"}>Back to cooks</.back>
 
 <.modal :if={@live_action == :edit} id="cook-modal" show on_cancel={JS.patch(~p"/cooks/#{@cook}")}>

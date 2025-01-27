@@ -9,3 +9,10 @@
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.bg-custom-artwork-embossed {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('/images/open_boss_embossed.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
