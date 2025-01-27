@@ -6,12 +6,14 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
 
   @shortdoc "Build a docker image"
   def run(_) do
+    {_result, 0} = System.cmd("npm", ["install"], cd: "assets")
+
     {_result, 0} =
       System.cmd("docker", [
         "buildx",
         "build",
         # "--platform",
-        # "linux/amd64,linux/arm64",
+        # "linux/arm64,linux/amd64",
         ".",
         "--tag",
         "open_boss:latest"

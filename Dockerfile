@@ -16,10 +16,9 @@ RUN rm -rf _build deps
 
 RUN mix local.hex --force
 RUN mix local.rebar --force
-RUN mix clean
-RUN mix deps.get
-RUN mix assets.deploy
-RUN mix release
+RUN mix deps.get && \
+  mix assets.deploy  && \
+  mix release
 
 FROM alpine:3.21.0
 
