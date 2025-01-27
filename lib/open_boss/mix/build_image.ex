@@ -12,8 +12,11 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
       case System.get_env("PLAFORMS", nil) do
         nil ->
           System.cmd("docker", [
+            "buildx",
             "build",
             ".",
+            "--output",
+            "type=docker"
             "--tag",
             "open_boss:latest"
           ])
@@ -25,6 +28,8 @@ defmodule Mix.Tasks.OpenBoss.BuildImage do
             "--platform",
             platforms,
             ".",
+            "--output",
+            "type=docker"
             "--tag",
             "open_boss:latest"
           ])
