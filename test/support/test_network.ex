@@ -7,7 +7,7 @@ defmodule OpenBoss.TestNetwork do
   @behaviour Network
 
   @impl Network
-  def list_adapters() do
+  def list_adapters do
     []
   end
 

@@ -47,6 +47,6 @@ jobs:
       - name: lint - credo
         run: mix credo --strict
       - name: lint - dialyzer
-        run: mix dialyzer --halt-exit-status
+        run: mix dialyzer
       - name: Run tests
         run: mix test
