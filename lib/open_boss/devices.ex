@@ -6,54 +6,34 @@ defmodule OpenBoss.Devices do
   alias OpenBoss.Devices.Device
   alias OpenBoss.Devices.Manager
 
+  @typedoc """
+  id type for devices
+  """
   @type id() :: non_neg_integer()
 
-  case Application.compile_env!(:open_boss, __MODULE__) |> Keyword.fetch!(:list) do
-    :live ->
-      @doc """
-      Get a list of all active devices
-      """
-      @spec list() :: list(Device.t())
-      defdelegate list, to: Manager
-
-      @doc """
-      Get stored state of a given device
-      """
-      @spec device_state(device_id :: non_neg_integer()) ::
-              {:ok, Device.t()} | {:error, :not_found}
-      defdelegate device_state(device_id), to: Manager
-
-    :all ->
-      @doc """
-      Get a list of all devices, active and inactive
-      """
-      @spec list() :: list(Device.t())
-      def list, do: list_all()
-
-      @doc """
-      Get most current state of a given device
-      """
-      @spec device_state(device_id :: non_neg_integer()) ::
-              {:ok, Device.t()} | {:error, :not_found}
-      def device_state(device_id) do
-        case OpenBoss.Repo.get(Device, device_id) do
-          nil -> {:error, :not_found}
-          device -> {:ok, device}
-        end
-      end
-  end
+  @doc """
+  Get a list of all devices, active and inactive
+  """
+  @spec list() :: list(Device.t())
+  def list, do: OpenBoss.Repo.all(Device)
 
   @doc """
-  List all devices, online or offline
+  Get most current state of a given device
   """
-  @spec list_all() :: list(Device.t())
-  def list_all, do: OpenBoss.Repo.all(Device)
+  @spec device_state(device_id :: non_neg_integer()) ::
+          {:ok, Device.t()} | {:error, :not_found}
+  def device_state(device_id) do
+    with {:error, :not_found} <- Manager.device_state(device_id),
+         device <- OpenBoss.Repo.get(Device, device_id) do
+      if device, do: {:ok, device}, else: {:error, :not_found}
+    end
+  end
 
   @doc """
   Set device desired temp. The device must be online.
   """
   @spec set_temp(
-          device_id :: non_neg_integer(),
+          device_id :: id(),
           temp :: float(),
           unit :: :farenheit | :celsius
         ) ::

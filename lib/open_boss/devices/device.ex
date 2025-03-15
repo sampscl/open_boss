@@ -36,7 +36,8 @@ defmodule OpenBoss.Devices.Device do
               :pos_version,
               :revert_avail_version,
               :wifi_version,
-              :name
+              :name,
+              :online?
             ]
 
   @primary_key {:id, :integer, autogenerate: false}
@@ -67,6 +68,7 @@ defmodule OpenBoss.Devices.Device do
     field(:wifi_version, :string)
     field(:name, :string)
     field(:last_communication, :utc_datetime_usec)
+    field(:online?, :boolean, virtual: true, default: false)
     has_many(:cooks, Cook, on_delete: :nilify_all)
     timestamps(type: :utc_datetime)
   end

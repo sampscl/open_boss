@@ -4,9 +4,13 @@
     {"Last updated #{@relative_time_string}"}
   </:subtitle>
   <:actions>
-    <.link patch={~p"/devices/#{@device.id}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Configure...</.button>
-    </.link>
+    <%= if @device.online? do %>
+      <.link patch={~p"/devices/#{@device.id}/show/edit"} phx-click={JS.push_focus()}>
+        <.button>Configure...</.button>
+      </.link>
+    <% else %>
+      <span class="text-gray-400">Offline</span>
+    <% end %>
   </:actions>
 </.header>
 <.back navigate={~p"/devices"}>Back to Devices</.back>

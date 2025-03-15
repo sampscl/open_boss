@@ -1,0 +1,37 @@
+<.header>
+  Displays
+  <:actions></:actions>
+</.header>
+
+<.table
+  id="display"
+  rows={@streams.displays}
+  row_click={fn {_id, display} -> JS.navigate(~p"/display/#{display}") end}
+>
+  <:col :let={{_id, display}} label="Brightness">{display.brightness}</:col>
+  <:col :let={{_id, display}} label="Path">{display.path}</:col>
+  <:action :let={{_id, display}}>
+    <div class="sr-only">
+      <.link navigate={~p"/display/#{display}"}>Show</.link>
+    </div>
+    <.link patch={~p"/display/#{display}/edit"}>Edit</.link>
+  </:action>
+</.table>
+
+<div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
+
+<.modal
+  :if={@live_action in [:edit]}
+  id="display-modal"
+  show
+  on_cancel={JS.patch(~p"/display")}
+>
+  <.live_component
+    module={OpenBossWeb.DisplayLive.FormComponent}
+    id={@display.id || :new}
+    title={@page_title}
+    action={@live_action}
+    display={@display}
+    patch={~p"/display"}
+  />
+</.modal>

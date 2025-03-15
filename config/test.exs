@@ -1,8 +1,9 @@
 import Config
 
 # Test env lists all devices
-config :open_boss, OpenBoss.Devices, list: :all
 config :open_boss, OpenBoss.Devices.Manager, enable_mqtt: false
+
+config :open_boss, OpenBoss.Network, implementation: OpenBoss.TestNetwork
 
 # Configure your database
 #

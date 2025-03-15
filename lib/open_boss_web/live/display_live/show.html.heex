@@ -1,0 +1,33 @@
+<.header>
+  Display {@display.id}
+  <:actions>
+    <.link patch={~p"/display/#{@display}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit display</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Brightness">{@display.brightness}</:item>
+  <:item title="Path">{@display.path}</:item>
+</.list>
+
+<.back navigate={~p"/display"}>Back to display</.back>
+
+<div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
+
+<.modal
+  :if={@live_action == :edit}
+  id="display-modal"
+  show
+  on_cancel={JS.patch(~p"/display/#{@display}")}
+>
+  <.live_component
+    module={OpenBossWeb.DisplayLive.FormComponent}
+    id={@display.id}
+    title={@page_title}
+    action={@live_action}
+    display={@display}
+    patch={~p"/display/#{@display}"}
+  />
+</.modal>

@@ -25,6 +25,8 @@ defmodule OpenBoss.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import OpenBoss.DataCase
+
+      import OpenBoss.Factory
     end
   end
 

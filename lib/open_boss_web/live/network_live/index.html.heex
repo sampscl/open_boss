@@ -1,0 +1,45 @@
+<.header>
+  Network
+  <:actions></:actions>
+</.header>
+
+<div class="mt-8 z-10 w-full">
+  <.table
+    id="adapters"
+    rows={@adapters}
+    row_click={fn adapter -> JS.navigate(~p"/network/#{adapter.id}") end}
+  >
+    <:action :let={adapter}>
+      <div class="sr-only">
+        <.link navigate={~p"/network/#{adapter.id}"}>Show</.link>
+      </div>
+      <%= if adapter.mutable do %>
+        <.link patch={~p"/network/#{adapter.id}/edit"} class="text-zinc-600 hover:text-zinc-900">
+          Edit
+        </.link>
+      <% end %>
+    </:action>
+
+    <:col :let={adapter} label="Name">
+      {adapter.id}
+    </:col>
+  </.table>
+</div>
+
+<div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
+
+<.modal
+  :if={@live_action == :edit}
+  id="adapter-modal"
+  show
+  on_cancel={JS.patch(~p"/network/#{@adapter}")}
+>
+  <.live_component
+    module={OpenBossWeb.NetworkLive.WifiFormComponent}
+    id={@adapter.id}
+    title={@page_title}
+    action={@live_action}
+    adapter={@adapter}
+    patch={~p"/network/#{@adapter}"}
+  />
+</.modal>

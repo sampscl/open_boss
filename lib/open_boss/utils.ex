@@ -40,4 +40,11 @@ defmodule OpenBoss.Utils do
     |> NaiveDateTime.truncate(:second)
     |> NaiveDateTime.to_string()
   end
+
+  @spec quiet_noisy_deps() :: :ok
+  def quiet_noisy_deps do
+    Logger.put_application_level(:mdns, :info)
+    Logger.put_application_level(:emqtt, :info)
+    :ok
+  end
 end

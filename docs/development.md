@@ -4,27 +4,26 @@
 
 Urgent
 
+- [ ] Network config in UI
 - [ ] Installation system for less technical users
+- [ ] Adjust the device code to be more testable and write tests
+- [ ] Alarm or alert system for when the time series device data diverges "too far"
 - [x] Bug in history live chart that causes re-rendering artifacts
 - [x] Fix existing tests
 - [x] Elixir release for the app
-- [ ] Adjust the device code to be more testable and write tests
 - [x] UI timer for "last updated xxx ago..."
 - [x] Tests for the phoenix-y parts
 - [x] Add the `Cooks` context
 - [x] Time series data for cooks
-- [ ] Alarm or alert system for when the time series device data diverges "too far"
 
 Not So Urgent
 
-- [ ] Reorganize documentation
-- [ ] Cross-platform docker image builds
-- [ ] Docker registry for pre-built images
+- [x] Virtual field in devices to support offline/online flag
+- [ ] Support devices other than Egg Genius
+- [x] Reorganize documentation
 - [x] Stop Cook button for quick, common, change to a cook
-- [ ] Virtual field in devices to support offline/online flag
 - [x] Some sort of automated installer or instructions
 - [x] Update the main app to be less "here's you're phoenix skeleton" and more "here's Open Boss"
-- [ ] Support devices other than Egg Genius
 - [x] Better github integration
 - [x] UI graphs for time series device data
 
@@ -53,16 +52,47 @@ sudo apt-get install -y build-essential make autoconf libssl-dev libncurses-dev
 cd open_boss
 asdf plugin-add elixir
 asdf plugin-add erlang
-asdf plugin-add zig
 asdf plugin-add nodejs
 asdf install
 ```
 
-5. Get deps and make sure tests run successfully
+5. One-time Elixir and Erlang language setup
+
+```shell
+mix local.hex
+mix local.rebar
+mix archive.install hex nerves_bootstrap
+```
+
+6. Get deps and make sure tests run successfully
 
 ```shell
 mix deps.get
 mix test
+```
+
+## Running Locally
+
+Nerves uses `MIX_TARGET=host` to allow standard Elixir development, but eventually the code
+should be tested on the target. There is a good deal of interplay between the files in
+`config/*.exs` for this; but in general, you insert a micro SD card into your laptop
+and run:
+
+```shell
+MIX_ENV=prod MIX_TARGET=rpi4 mix do deps.get, firmware, burn
+```
+
+For the koisk build, which is meant to work with the Pi Touchscreen, use:
+
+```shell
+MIX_ENV=prod MIX_TARGET=rpi4_kiosk mix do deps.get, firmware, burn
+```
+
+Once you have a working target device, you can build and update the firmware remotely
+in one step with:
+
+```shell
+MIX_TARGET=rpi4_kiosk MIX_ENV=prod "$SHELL" -c 'mix firmware && ./upload.sh open-boss.local'
 ```
 
 ## Reverse Engineered Protocol

@@ -11,7 +11,7 @@ defmodule OpenBossWeb.CookLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:devices, Devices.list_all())
+     |> assign(:devices, Devices.list())
      |> assign_new(:form, fn ->
        to_form(Cooks.change_cook(cook))
      end)}

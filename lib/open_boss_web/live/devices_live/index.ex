@@ -59,7 +59,7 @@ defmodule OpenBossWeb.DevicesLive.Index do
   @impl true
   def handle_info({:worker_lost, device_state}, socket) do
     {:noreply,
-     stream_delete(
+     stream_insert(
        socket,
        :devices,
        device_state

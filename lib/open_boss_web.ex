@@ -58,6 +58,15 @@ defmodule OpenBossWeb do
     end
   end
 
+  def live_view_nav_item do
+    quote do
+      use Phoenix.LiveView,
+        layout: {OpenBossWeb.Layouts, :nav_item}
+
+      unquote(html_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent

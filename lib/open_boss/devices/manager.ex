@@ -1,6 +1,7 @@
 defmodule OpenBoss.Devices.Manager do
   @moduledoc """
-  Management genserver for devices
+  Management genserver for devices, deals with
+  online devices.
   """
 
   require Logger
@@ -191,7 +192,7 @@ defmodule OpenBoss.Devices.Manager do
         Phoenix.PubSub.broadcast(
           OpenBoss.PubSub,
           Topics.device_presence(),
-          {:worker_lost, device}
+          {:worker_lost, %{device | online?: false}}
         )
 
       {:noreply,
@@ -267,7 +268,12 @@ defmodule OpenBoss.Devices.Manager do
 
   @spec load_device(integer() | nil) :: Device.t() | nil
   defp load_device(nil), do: nil
-  defp load_device(device_id), do: Repo.get(Device, device_id)
+
+  defp load_device(device_id) do
+    with device <- Repo.get(Device, device_id) do
+      Map.put(device, :online?, true)
+    end
+  end
 
   if Application.compile_env!(:open_boss, __MODULE__) |> Keyword.fetch!(:enable_mqtt) do
     @spec start_mqtt({:ensure_managed, map()}, State.t()) :: {:noreply, State.t()}
@@ -329,6 +335,7 @@ defmodule OpenBoss.Devices.Manager do
             id: device_id,
             ip: ip_string,
             port: port,
+            online?: true,
             last_communication: DateTime.utc_now()
           })
           |> Repo.insert_or_update()
