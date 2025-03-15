@@ -35,7 +35,7 @@ jobs:
           restore-keys: ${{ runner.os }}-mix-
       - name: Install packages
         run: |
-          mix archive.install hex nerves_bootstrap
+          mix archive.install hex nerves_bootstrap --force
           mix local.hex --force
           mix local.rebar --force
       - name: Install dependencies
