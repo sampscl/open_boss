@@ -1,6 +1,6 @@
 defmodule OpenBoss.Target.Displays do
   @moduledoc """
-  Host implementation
+  Target implementation
   """
 
   alias OpenBoss.Displays

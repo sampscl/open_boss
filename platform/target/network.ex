@@ -1,4 +1,7 @@
 defmodule OpenBoss.Target.Network do
+  @moduledoc """
+  Target implementation
+  """
   alias OpenBoss.Network
   alias OpenBoss.Network.Adapter
   alias OpenBoss.Network.WifiConfiguration

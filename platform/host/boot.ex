@@ -1,6 +1,6 @@
 defmodule OpenBoss.Host.Boot do
   @moduledoc """
-  Boot implementation
+  Host implementation
   """
 
   alias OpenBoss.Boot
