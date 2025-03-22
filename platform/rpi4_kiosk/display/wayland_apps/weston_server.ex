@@ -32,7 +32,13 @@ defmodule OpenBoss.Rpi4Kiosk.Display.WaylandApps.WestonServer do
   def init(args) do
     Process.flag(:trap_exit, true)
 
-    weston_args = Keyword.get(args, :weston_args, "--shell=kiosk --continue-without-input")
+    weston_args =
+      Keyword.get(
+        args,
+        :weston_args,
+        "--shell=kiosk --continue-without-input --config=/etc/weston.ini"
+      )
+
     weston_env = Keyword.get(args, :weston_env, [{"XDG_RUNTIME_DIR", "/run"}])
 
     wait_for_device("/dev/dri", ~r/^card[0-9]$/, _wait_time = 3000, _retry_count = 5)

@@ -5,6 +5,7 @@
 Urgent
 
 - [ ] Network config in UI
+- [ ] On-screen keyboard for pi kiosk
 - [ ] Installation system for less technical users
 - [ ] Adjust the device code to be more testable and write tests
 - [ ] Alarm or alert system for when the time series device data diverges "too far"
@@ -59,9 +60,9 @@ asdf install
 5. One-time Elixir and Erlang language setup
 
 ```shell
+mix archive.install hex nerves_bootstrap
 mix local.hex
 mix local.rebar
-mix archive.install hex nerves_bootstrap
 ```
 
 6. Get deps and make sure tests run successfully
@@ -69,6 +70,12 @@ mix archive.install hex nerves_bootstrap
 ```shell
 mix deps.get
 mix test
+```
+
+7. Build static assets (only needed when they change)
+
+```shell
+mix assets.deploy
 ```
 
 ## Running Locally
