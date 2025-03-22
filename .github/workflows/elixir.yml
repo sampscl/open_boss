@@ -8,11 +8,13 @@ name: Elixir CI
 on:
   push:
     branches: ["main"]
+    tags:
+      - 'v*.*.*'
   pull_request:
     branches: ["main"]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -22,31 +24,44 @@ jobs:
       ImageOS: ubuntu22
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Elixir
-        uses: erlef/setup-beam@61e01a43a562a89bfc54c7f9a378ff67b03e4a21 # v1.16.0
-        with:
-          otp-version: "27.1"
-          elixir-version: "1.17.3"
-      - name: Restore dependencies cache
-        uses: actions/cache@v3
-        with:
-          path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
-      - name: Install O/S deps
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential libmnl-dev libnl-3-dev libnl-genl-3-dev
-      - name: Install packages
-        run: |
-          mix archive.install hex nerves_bootstrap --force
-          mix local.hex --force
-          mix local.rebar --force
-      - name: Install dependencies
-        run: mix deps.get
+      - uses: ./.github/actions/setup-elixir
+      
       - name: lint - credo
-        run: mix credo --strict
+        run: |
+          mix credo --strict
+          MIX_TARGET=rpi4 mix credo --strict
+          MIX_TARGET=rpi4_kiosk mix credo --strict
+          
       - name: lint - dialyzer
-        run: mix dialyzer
+        run: |
+          mix dialyzer
+          MIX_TARGET=rpi4 mix dialyzer
+          MIX_TARGET=rpi4_kiosk mix dialyzer
+          
       - name: Run tests
         run: mix test
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-elixir
+      
+      - name: Build Release Package 1
+        run: echo "TODO: Add commands to build first release package"
+        
+      - name: Build Release Package 2
+        run: echo "TODO: Add commands to build second release package"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          files: |
+            package1.tar.gz
+            package2.tar.gz
+          generate_release_notes: true
