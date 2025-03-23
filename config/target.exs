@@ -38,24 +38,36 @@ config :nerves,
 # * See https://hexdocs.pm/nerves_ssh/readme.html for general SSH configuration
 # * See https://hexdocs.pm/ssh_subsystem_fwup/readme.html for firmware updates
 
-keys =
-  [
-    Path.join([System.user_home!(), ".ssh", "id_rsa.pub"]),
-    Path.join([System.user_home!(), ".ssh", "id_ecdsa.pub"]),
-    Path.join([System.user_home!(), ".ssh", "id_ed25519.pub"])
-  ]
-  |> Enum.filter(&File.exists?/1)
+if !System.get_env("GITHUB_ACTIONS") do
+  keys =
+    [
+      Path.join([System.user_home!(), ".ssh", "id_rsa.pub"]),
+      Path.join([System.user_home!(), ".ssh", "id_ecdsa.pub"]),
+      Path.join([System.user_home!(), ".ssh", "id_ed25519.pub"])
+    ]
+    |> Enum.filter(&File.exists?/1)
 
-if keys == [],
-  do:
-    Mix.raise("""
-    No SSH public keys found in ~/.ssh. An ssh authorized key is needed to
-    log into the Nerves device and update firmware on it using ssh.
-    See your project's config.exs for this error message.
-    """)
+  if keys == [],
+    do:
+      Mix.raise("""
+      No SSH public keys found in ~/.ssh. An ssh authorized key is needed to
+      log into the Nerves device and update firmware on it using ssh.
+      See your project's target.exs for this error message.
+      """)
 
-config :nerves_ssh,
-  authorized_keys: Enum.map(keys, &File.read!/1)
+  config :nerves_ssh,
+    authorized_keys: Enum.map(keys, &File.read!/1)
+else
+  #
+  # CI builds create "blank" firmware that will be configured
+  # by the user later from the UI. Until then, support logging
+  # in and updating firmware via ssh without credentials
+  #
+  config :nerves_ssh,
+    user_passwords: [
+      {"open_boss", ""}
+    ]
+end
 
 ssid = System.get_env("NERVES_SSID")
 psk = System.get_env("NERVES_PSK")
