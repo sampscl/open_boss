@@ -37,8 +37,34 @@ defmodule OpenBoss.Target.Network do
   end
 
   @impl Network
-  def apply_configuration(_adapter) do
+  def apply_configuration(%Adapter{type: VintageNetEthernet}) do
     raise("Not implemented")
+  end
+
+  @impl Network
+  def apply_configuration(%Adapter{
+        id: id,
+        type: VintageNetWiFi,
+        ipv4: %{method: :dhcp},
+        configuration: %{networks: networks}
+      }) do
+    networks =
+      Enum.map(networks, fn network ->
+        %{
+          mode: :infrastructure,
+          psk: network.psk,
+          ssid: network.ssid,
+          key_mgmt: :wpa_psk
+        }
+      end)
+
+    config = %{
+      type: VintageNetWiFi,
+      ipv4: %{method: :dhcp},
+      networks: networks
+    }
+
+    VintageNet.configure(id, config)
   end
 
   @spec changeset_from_config(Adapter.t(), map()) :: Ecto.Changeset.t()
