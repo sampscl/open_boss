@@ -50,11 +50,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-elixir
 
-      - name: Build Release Package 1
-        run: 'echo "TODO: Add commands to build first release package"'
+      - name: Deploy static assets
+        run: mix assets.deploy
 
-      - name: Build Release Package 2
-        run: 'echo "TODO: Add commands to build second release package"'
+      - name: Build Kiosk Firmware
+        run: |
+          MIX_ENV=prod MIX_TARGET=rpi4_kiosk mix deps.get
+          MIX_ENV=prod MIX_TARGET=rpi4_kiosk mix firmware --output "open_boss_rpi4_kiosk-${{ github.ref_name }}.fw"
+
+      - name: Build Pi4 Firmware
+        run: |
+          MIX_ENV=prod MIX_TARGET=rpi4 mix deps.get
+          MIX_ENV=prod MIX_TARGET=rpi4 mix firmware --output "open_boss_rpi4-${{ github.ref_name }}.fw"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -62,6 +69,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            package1.tar.gz
-            package2.tar.gz
+            open_boss_rpi4_kiosk-${{ github.ref_name }}.fw
+            open_boss_rpi4-${{ github.ref_name }}.fw
           generate_release_notes: true
