@@ -17,7 +17,7 @@ if config_env() == :prod do
   # meant to run in a cloud / server prod environment like a standard phoenix app
   secret_key_base = "rQUsriZ8++PjeCJAa9oANfHoyYn3Aq/zYyNpGuNRsN0N4jhxV/DiCmfrDjP+3wL9"
 
-  host = "open_boss.local"
+  host = "open-boss.local"
   port = 80
 
   config :open_boss, OpenBossWeb.Endpoint,
