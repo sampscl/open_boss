@@ -1,34 +1,38 @@
 <.header>
   {@adapter.id}
   <:actions>
-    <%= if @adapter.mutable do %>
-      <.link patch={~p"/network/#{@adapter}/show/edit"} phx-click={JS.push_focus()}>
-        <.button>Edit</.button>
-      </.link>
+    <%= cond do %>
+      <% @adapter.mutable and @adapter.type == VintageNetWiFi -> %>
+        <.link patch={~p"/network/#{@adapter}/show/edit_wifi"} phx-click={JS.push_focus()}>
+          <.button>Edit</.button>
+        </.link>
+      <% @adapter.mutable -> %>
+        <.link patch={~p"/network/#{@adapter}/show/edit"} phx-click={JS.push_focus()}>
+          <.button>Edit</.button>
+        </.link>
+      <% true -> %>
+        ""
     <% end %>
   </:actions>
 </.header>
 
 <%= case @adapter.type do %>
   <% VintageNetWiFi -> %>
-    <.list>
-      <:item title="Interface">
-        {@adapter.id}
-      </:item>
-      <:item title="Network SSID">
-        {@adapter.configuration.ssid}
-      </:item>
-      <:item title="Password">
-        {@adapter.configuration.psk}
-      </:item>
-    </.list>
+    <.table id="wifi-devices" rows={@adapter.configuration.networks}>
+      <:col :let={network} label="Network SSID">
+        {network.ssid}
+      </:col>
+      <:col :let={network} label="Password">
+        {network.psk}
+      </:col>
+    </.table>
   <% _ -> %>
     <.list>
       <:item title="Interface">
         {@adapter.id}
       </:item>
       <:item title="Adapter Type">
-        {"Unknown: \"#{@adapter.type}\""}
+        {Adapter.type_name(@adapter)}
       </:item>
     </.list>
 <% end %>
@@ -45,6 +49,22 @@
 >
   <.live_component
     module={OpenBossWeb.NetworkLive.WifiFormComponent}
+    id={@adapter.id}
+    title={@page_title}
+    action={@live_action}
+    adapter={@adapter}
+    patch={~p"/network/#{@adapter}"}
+  />
+</.modal>
+
+<.modal
+  :if={@live_action == :edit_wifi}
+  id="adapter-modal"
+  show
+  on_cancel={JS.patch(~p"/network/#{@adapter}")}
+>
+  <.live_component
+    module={OpenBossWeb.NetworkLive.WifiConfigsComponent}
     id={@adapter.id}
     title={@page_title}
     action={@live_action}

@@ -4,6 +4,7 @@ defmodule OpenBossWeb.NetworkLive.Show do
   use Gettext, backend: OpenBossWeb.Gettext
 
   alias OpenBoss.Network
+  alias OpenBoss.Network.Adapter
 
   @impl true
   def mount(_params, _session, socket) do

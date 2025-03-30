@@ -13,11 +13,13 @@ defmodule OpenBoss.Network.Adapter do
   @required [:id]
   @fields @required ++ [:configuration, :mutable, :type]
 
+  @types %{VintageNetEthernet => "Ethernet", VintageNetWiFi => "WiFi"}
+
   @primary_key false
   embedded_schema do
     field(:id, :string, primary_key: true)
     field(:mutable, :boolean, default: false)
-    field(:type, Ecto.Enum, values: [VintageNetEthernet, VintageNetWiFi])
+    field(:type, Ecto.Enum, values: Map.keys(@types))
     field(:configuration, :map)
     embeds_one(:ipv4, Ipv4)
   end
@@ -28,5 +30,10 @@ defmodule OpenBoss.Network.Adapter do
     |> cast(params, @fields)
     |> cast_embed(:ipv4)
     |> validate_required(@required)
+  end
+
+  @spec type_name(t()) :: String.t()
+  def type_name(%{type: type}) do
+    Map.fetch!(@types, type)
   end
 end

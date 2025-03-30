@@ -35,6 +35,7 @@ defmodule OpenBossWeb.Router do
     live "/network/:id", NetworkLive.Show, :show
     live "/network/:id/edit", NetworkLive.Index, :edit
     live "/network/:id/show/edit", NetworkLive.Show, :edit
+    live "/network/:id/show/edit_wifi", NetworkLive.Show, :edit_wifi
 
     live "/display", DisplayLive.Index, :index
     live "/display/:id/edit", DisplayLive.Index, :edit

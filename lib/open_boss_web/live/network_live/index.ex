@@ -4,6 +4,7 @@ defmodule OpenBossWeb.NetworkLive.Index do
   use Gettext, backend: OpenBossWeb.Gettext
 
   alias OpenBoss.Network
+  alias OpenBoss.Network.Adapter
 
   require Logger
 

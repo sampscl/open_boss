@@ -30,4 +30,10 @@ defmodule OpenBoss.Network do
       apply_configuration(adapter)
     end
   end
+
+  @spec hostname() :: String.t()
+  def hostname do
+    {:ok, host} = :inet.gethostname()
+    to_string(host) <> ".local"
+  end
 end
