@@ -102,6 +102,10 @@ in one step with:
 MIX_TARGET=rpi4_kiosk MIX_ENV=prod "$SHELL" -c 'mix firmware && ./upload.sh open-boss.local'
 ```
 
+## Running in QEMU
+
+https://github.com/nerves-project/nerves_system_x86_64?tab=readme-ov-file#running-in-qemu
+
 ## Reverse Engineered Protocol
 
 - Devices self-identify on the network with mDNS as `_flameboss._tcp.local`
