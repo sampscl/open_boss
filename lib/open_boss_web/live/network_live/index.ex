@@ -10,16 +10,20 @@ defmodule OpenBossWeb.NetworkLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    adapters = Network.list_adapters()
+
     if connected?(socket) do
       # This is effectively a no-op when platform == :host
-      :ok = VintageNet.subscribe(["interface", :_, "addresses"])
-      :ok = VintageNet.subscribe(["interface", :_, "connection"])
+      Enum.each(adapters, fn %{id: id} ->
+        :ok = VintageNet.subscribe(["interface", id, "addresses"])
+        :ok = VintageNet.subscribe(["interface", id, "connection"])
+      end)
     end
 
     {
       :ok,
       socket
-      |> assign(:adapters, Network.list_adapters())
+      |> assign(:adapters, adapters)
     }
   end
 

@@ -7,21 +7,13 @@ defmodule OpenBoss.Factory do
     %OpenBoss.Network.Adapter{
       id: "some adapter",
       mutable: true,
-      type: VintageNetWiFi,
-      configuration: build(:wifi_configuration),
-      ipv4: build(:ipv4)
+      configuration: build(:wifi_configuration)
     }
   end
 
   def wifi_configuration_factory do
     %OpenBoss.Network.WifiConfiguration{
       networks: [%{ssid: "some ssid", psk: "some secret"}]
-    }
-  end
-
-  def ipv4_factory do
-    %OpenBoss.Network.Ipv4{
-      method: :dhcp
     }
   end
 

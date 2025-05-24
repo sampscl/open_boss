@@ -13,8 +13,46 @@
       {adapter.id}
     </:col>
 
-    <:col :let={adapter} label="Type">
-      {Adapter.type_name(adapter)}
+    <:col :let={adapter} label="Details">
+      <.list>
+        <:item title="Type">
+          {Adapter.type_name(adapter.configuration["type"])}
+        </:item>
+
+        <:item title="Connection">
+          {Adapter.connection_name(adapter.configuration["connection"])}
+        </:item>
+
+        <:item title="Addresses">
+          {if addresses = adapter.configuration["addresses"] do
+            Enum.map_join(addresses, "<br>", fn ip ->
+              Adapter.address_string(ip)
+            end)
+            |> Phoenix.HTML.raw()
+          else
+            "-"
+          end}
+        </:item>
+
+        <:item :if={adapter.configuration["type"] == VintageNetWiFi} title="Current Access Point">
+          <%= if current_ap = get_in(adapter.configuration, ["wifi", "current_ap"]) do %>
+            {Adapter.ap_string(current_ap)}
+          <% else %>
+            -
+          <% end %>
+        </:item>
+
+        <:item :if={adapter.configuration["type"] == VintageNetWiFi} title="Access Points">
+          <%= if aps = get_in(adapter.configuration, ["wifi", "access_points"]) do %>
+            {Enum.map_join(aps, "<br>", fn ip ->
+              Adapter.ap_string(ip)
+            end)
+            |> Phoenix.HTML.raw()}
+          <% else %>
+            -
+          <% end %>
+        </:item>
+      </.list>
     </:col>
   </.table>
 </div>
