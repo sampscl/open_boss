@@ -3,7 +3,7 @@ defmodule OpenBoss.System do
   System context
   """
 
-  @callback reboot() :: :ok
+  @callback reboot() :: :ok | {:error, any()}
   defdelegate reboot,
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
 end

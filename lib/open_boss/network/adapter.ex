@@ -47,7 +47,7 @@ defmodule OpenBoss.Network.Adapter do
     |> validate_required(@required)
   end
 
-  @spec validate_configuration(t(), map()) :: Ecto.Changset.t()
+  @spec validate_configuration(t(), map()) :: Ecto.Changeset.t()
   def validate_configuration(adapter, params) do
     changeset(adapter, params)
     |> validate_change(:configuration, fn :configuration, configuration ->

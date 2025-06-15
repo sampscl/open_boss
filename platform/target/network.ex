@@ -58,18 +58,12 @@ defmodule OpenBoss.Target.Network do
 
   @impl Network
   def apply_configuration(_) do
-    raise("Not implemented")
+    {:error, "Apply configuration not supported on the host"}
   end
 
   @impl Network
   def run_vintage_net_wizard do
     VintageNetWizard.run_wizard()
-  end
-
-  @impl Network
-  def reset_to_defaults(interface) do
-    _ = VintageNet.reset_to_defaults(interface)
-    :ok
   end
 
   @spec changeset_from_config(Adapter.t(), map()) :: Ecto.Changeset.t()

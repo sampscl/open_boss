@@ -13,7 +13,6 @@ defmodule OpenBoss.Network do
   @callback apply_configuration(Adapter.t()) ::
               :ok | {:error, any()}
   @callback run_vintage_net_wizard() :: Supervisor.on_start()
-  @callback reset_to_defaults(String.t()) :: :ok
 
   defdelegate list_adapters,
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
@@ -27,9 +26,6 @@ defmodule OpenBoss.Network do
   defdelegate change_adapter(adapter, params \\ %{}), to: Adapter, as: :changeset
 
   defdelegate run_vintage_net_wizard,
-    to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
-
-  defdelegate reset_to_defaults(interface),
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
 
   @spec update_adapter(Adapter.t(), map()) ::

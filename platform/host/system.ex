@@ -7,7 +7,5 @@ defmodule OpenBoss.Host.System do
   @behaviour System
 
   @impl System
-  def reboot do
-    raise "Reboot not implemented on host platform"
-  end
+  def reboot, do: {:error, "Reboot not supported on the host"}
 end

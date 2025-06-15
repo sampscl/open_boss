@@ -40,10 +40,7 @@ defmodule OpenBoss.Host.Network do
   end
 
   @impl Network
-  def run_vintage_net_wizard(), do: raise("VintageNet not implmented on host platform")
-
-  @impl Network
-  def reset_to_defaults(_), do: raise("VintageNet not implmented on host platform")
+  def run_vintage_net_wizard(), do: :ignore
 
   @spec convert!(:net.ifaddrs()) :: Adapter.t()
   defp convert!(%{name: name, addr: %{family: :inet, addr: addr}}) do
