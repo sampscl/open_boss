@@ -1,5 +1,8 @@
 import Config
 
+# Network wizard on startup
+config :open_boss, OpenBoss.Network, wizard_file: "/root/start_vintage_net_wizard"
+
 # Timezone database
 config :tzdata, :data_dir, "/root/"
 
@@ -10,6 +13,7 @@ config :open_boss, HelloLiveViewWeb.Endpoint,
   watchers: []
 
 config :open_boss, OpenBoss.Network, implementation: OpenBoss.Target.Network
+config :open_boss, OpenBoss.System, implementation: OpenBoss.Target.System
 
 # Use Ringlogger as the logger backend and remove :console.
 # See https://hexdocs.pm/ring_logger/readme.html for more information on

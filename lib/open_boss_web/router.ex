@@ -32,10 +32,7 @@ defmodule OpenBossWeb.Router do
     live "/cooks/:id/history", CookLive.History, :history
 
     live "/network", NetworkLive.Index, :index
-    live "/network/:id", NetworkLive.Show, :show
-    live "/network/:id/edit", NetworkLive.Index, :edit
-    live "/network/:id/show/edit", NetworkLive.Show, :edit
-    live "/network/:id/show/edit_wifi", NetworkLive.Show, :edit_wifi
+    post "/network/reset_wifi", NetworkController, :reset_wifi
 
     live "/display", DisplayLive.Index, :index
     live "/display/:id/edit", DisplayLive.Index, :edit

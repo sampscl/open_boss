@@ -71,7 +71,6 @@ defmodule OpenBoss.MixProject do
       {:ecto_sqlite3_extras, "~> 1.2.0"},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      # TODO bump on release to {:phoenix_live_view, "~> 1.0.0"},
       {:phoenix_live_view, "~> 1.0.0", override: true},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
@@ -112,6 +111,11 @@ defmodule OpenBoss.MixProject do
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.13.0", targets: @all_targets},
       {:nerves_pack, "~> 0.7.0", targets: @all_targets},
+      {:vintage_net_wizard, "~> 0.4", targets: @all_targets},
+
+      # Vintage net wizard introduced some deps conflicts, so
+      # do an override and revisit this later
+      {:cowlib, ">= 2.14.0 and < 3.0.0", override: true},
 
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version

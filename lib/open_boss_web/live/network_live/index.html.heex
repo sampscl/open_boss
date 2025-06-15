@@ -1,38 +1,62 @@
 <.header>
   Network
-  <:actions></:actions>
+  <:actions>
+    <.link href={~p"/network/reset_wifi"} method="post">
+      <.button class="opacity-60 hover:opacity-80 border border-gray-300 bg-gray-100 text-gray-600">
+        Reboot to Network Configuration Mode
+      </.button>
+    </.link>
+  </:actions>
 </.header>
 
 <div class="mt-8 z-10 w-full">
-  <.table
-    id="adapters"
-    rows={@adapters}
-    row_click={fn adapter -> JS.navigate(~p"/network/#{adapter.id}") end}
-  >
+  <.table id="adapters" rows={@adapters}>
     <:col :let={adapter} label="Name">
       {adapter.id}
     </:col>
 
-    <:col :let={adapter} label="Type">
-      {Adapter.type_name(adapter)}
+    <:col :let={adapter} label="Details">
+      <.list>
+        <:item title="Type">
+          {Adapter.type_name(adapter.configuration["type"])}
+        </:item>
+
+        <:item title="Connection">
+          {Adapter.connection_name(adapter.configuration["connection"])}
+        </:item>
+
+        <:item title="Addresses">
+          {if addresses = adapter.configuration["addresses"] do
+            Enum.map_join(addresses, "<br>", fn ip ->
+              Adapter.brief_address_string(ip)
+            end)
+            |> Phoenix.HTML.raw()
+          else
+            "-"
+          end}
+        </:item>
+
+        <:item :if={adapter.configuration["type"] == VintageNetWiFi} title="Current Access Point">
+          <%= if current_ap = get_in(adapter.configuration, ["wifi", "current_ap"]) do %>
+            {Adapter.ap_string(current_ap)}
+          <% else %>
+            -
+          <% end %>
+        </:item>
+
+        <:item :if={adapter.configuration["type"] == VintageNetWiFi} title="Access Points">
+          <%= if aps = get_in(adapter.configuration, ["wifi", "access_points"]) do %>
+            {Enum.map_join(aps, "<br>", fn ip ->
+              Adapter.ap_string(ip)
+            end)
+            |> Phoenix.HTML.raw()}
+          <% else %>
+            -
+          <% end %>
+        </:item>
+      </.list>
     </:col>
   </.table>
 </div>
 
 <div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
-
-<.modal
-  :if={@live_action == :wifi_configs}
-  id="wifi-configs-modal"
-  show
-  on_cancel={JS.patch(~p"/network/#{@adapter}")}
->
-  <.live_component
-    module={OpenBossWeb.NetworkLive.WifiConfigsComponent}
-    id={@adapter.id}
-    title="WiFi Networks"
-    adapter={@adapter}
-    configurations={@adapter.configurations}
-    patch={~p"/network/#{@adapter}"}
-  />
-</.modal>

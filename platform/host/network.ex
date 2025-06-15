@@ -39,6 +39,12 @@ defmodule OpenBoss.Host.Network do
     {:error, "configuration changes not supported on host"}
   end
 
+  @impl Network
+  def run_vintage_net_wizard(), do: raise("VintageNet not implmented on host platform")
+
+  @impl Network
+  def reset_to_defaults(_), do: raise("VintageNet not implmented on host platform")
+
   @spec convert!(:net.ifaddrs()) :: Adapter.t()
   defp convert!(%{name: name, addr: %{family: :inet, addr: addr}}) do
     addr = Tuple.to_list(addr) |> Enum.join(".")

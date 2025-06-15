@@ -7,49 +7,59 @@ defmodule OpenBoss.Application do
   require Logger
 
   alias OpenBoss.Boot
+  alias OpenBoss.Network
 
   @impl true
   def start(_type, _args) do
     Logger.info("Starting")
 
-    if :debug == Logger.level() do
-      Logger.debug("Turning down the log level in noisy deps")
-      OpenBoss.Utils.quiet_noisy_deps()
-    end
-
-    # Ensure database directory exists so the migrator
-    # can create the database (if needed) and migrate it
-    dbdir =
-      Application.fetch_env!(:open_boss, OpenBoss.Repo)
-      |> Keyword.fetch!(:database)
-      |> Path.dirname()
-
-    if File.exists?(dbdir) do
-      Logger.debug("Database directory exists: #{dbdir}")
+    if Network.needs_wifi_config?() do
+      Logger.warning("***********************************")
+      Logger.warning("* WiFi configuation needed        *")
+      Logger.warning("* Power Off then On when finished *")
+      Logger.warning("***********************************")
+      :ok = Network.put_needs_wifi_config(false)
+      Network.run_vintage_net_wizard()
     else
-      Logger.info("Creating database directory: #{dbdir}")
-      File.mkdir_p!(dbdir)
+      if :debug == Logger.level() do
+        Logger.debug("Turning down the log level in noisy deps")
+        OpenBoss.Utils.quiet_noisy_deps()
+      end
+
+      # Ensure database directory exists so the migrator
+      # can create the database (if needed) and migrate it
+      dbdir =
+        Application.fetch_env!(:open_boss, OpenBoss.Repo)
+        |> Keyword.fetch!(:database)
+        |> Path.dirname()
+
+      if File.exists?(dbdir) do
+        Logger.debug("Database directory exists: #{dbdir}")
+      else
+        Logger.info("Creating database directory: #{dbdir}")
+        File.mkdir_p!(dbdir)
+      end
+
+      children =
+        [
+          {Ecto.Migrator, repos: Application.fetch_env!(:open_boss, :ecto_repos)},
+          OpenBossWeb.Telemetry,
+          OpenBoss.Repo,
+          {Phoenix.PubSub, name: OpenBoss.PubSub},
+          # Start a worker by calling: OpenBoss.Worker.start_link(arg)
+          # {OpenBoss.Worker, arg},
+          {Task.Supervisor, name: OpenBoss.TaskSupervisor},
+          {OpenBoss.Devices.Manager, []},
+          {OpenBoss.Discovery, []},
+          # Start to serve requests, typically the last entry
+          OpenBossWeb.Endpoint
+        ] ++ children(target())
+
+      # See https://hexdocs.pm/elixir/Supervisor.html
+      # for other strategies and supported options
+      opts = [strategy: :one_for_one, name: OpenBoss.Supervisor]
+      Supervisor.start_link(children, opts)
     end
-
-    children =
-      [
-        {Ecto.Migrator, repos: Application.fetch_env!(:open_boss, :ecto_repos)},
-        OpenBossWeb.Telemetry,
-        OpenBoss.Repo,
-        {Phoenix.PubSub, name: OpenBoss.PubSub},
-        # Start a worker by calling: OpenBoss.Worker.start_link(arg)
-        # {OpenBoss.Worker, arg},
-        {Task.Supervisor, name: OpenBoss.TaskSupervisor},
-        {OpenBoss.Devices.Manager, []},
-        {OpenBoss.Discovery, []},
-        # Start to serve requests, typically the last entry
-        OpenBossWeb.Endpoint
-      ] ++ children(target())
-
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: OpenBoss.Supervisor]
-    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration

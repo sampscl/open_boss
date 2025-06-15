@@ -4,97 +4,79 @@ defmodule OpenBoss.Target.Network do
   """
   alias OpenBoss.Network
   alias OpenBoss.Network.Adapter
-  alias OpenBoss.Network.WifiConfiguration
-
-  require Logger
 
   @behaviour Network
 
+  require Logger
+
+  @props [
+    ["config"],
+    ["connection"],
+    ["state"],
+    ["type"],
+    ["addresses"],
+    ["wifi", "access_points"],
+    ["wifi", "current_ap"]
+  ]
+
+  @empty_adapter %{
+    "config" => nil,
+    "connection" => nil,
+    "state" => nil,
+    "type" => nil,
+    "addresses" => nil,
+    "wifi" => %{
+      "access_points" => nil,
+      "current_ap" => nil
+    }
+  }
+
   @impl Network
   def list_adapters do
-    Enum.reduce(VintageNet.configured_interfaces(), [], fn interface, acc ->
-      config = VintageNet.get_configuration(interface)
-
-      changeset_from_config(%Adapter{id: interface, mutable: true}, config)
-      |> Ecto.Changeset.apply_action(:list_adapters)
-      |> case do
-        {:ok, adapter} ->
-          [adapter | acc]
-
-        {:error, _changeset} ->
-          Logger.debug("Ignored adapter #{interface}")
-          acc
-      end
-    end)
+    (VintageNet.configured_interfaces() -- ["lo"]) |> Enum.map(&get_adapter!/1)
   end
 
   @impl Network
   def get_adapter!(interface) do
-    config = VintageNet.get_configuration(interface)
+    config =
+      VintageNet.get_by_prefix(["interface", interface])
+      |> Enum.reduce(@empty_adapter, fn
+        {["interface", ^interface | prop], value}, acc when prop in @props ->
+          Logger.debug(inspect({acc, prop, value}, pretty: true, limit: :infinity),
+            limit: :infinity
+          )
+
+          put_in(acc, prop, value)
+
+        _, acc ->
+          acc
+      end)
 
     changeset_from_config(%Adapter{id: interface, mutable: true}, config)
     |> Ecto.Changeset.apply_action!(:get_adapter!)
   end
 
   @impl Network
-  def apply_configuration(%Adapter{type: VintageNetEthernet}) do
+  def apply_configuration(_) do
     raise("Not implemented")
   end
 
   @impl Network
-  def apply_configuration(%Adapter{
-        id: id,
-        type: VintageNetWiFi,
-        ipv4: %{method: :dhcp},
-        configuration: %{networks: networks}
-      }) do
-    networks =
-      Enum.map(networks, fn network ->
-        %{
-          mode: :infrastructure,
-          psk: network.psk,
-          ssid: network.ssid,
-          key_mgmt: :wpa_psk
-        }
-      end)
+  def run_vintage_net_wizard do
+    VintageNetWizard.run_wizard()
+  end
 
-    config = %{
-      type: VintageNetWiFi,
-      ipv4: %{method: :dhcp},
-      networks: networks
-    }
-
-    VintageNet.configure(id, config)
+  @impl Network
+  def reset_to_defaults(interface) do
+    _ = VintageNet.reset_to_defaults(interface)
+    :ok
   end
 
   @spec changeset_from_config(Adapter.t(), map()) :: Ecto.Changeset.t()
-  defp changeset_from_config(adapter, config)
-
-  defp changeset_from_config(
-         adapter,
-         %{
-           type: VintageNetWiFi = type,
-           ipv4: ipv4
-         } = config
-       ) do
-    {:ok, configuration} =
-      WifiConfiguration.changeset_from_vintage_net_config(config)
-      |> Ecto.Changeset.apply_action(:apply)
-
-    Adapter.changeset(adapter, %{
-      mutable: true,
-      type: type,
-      ipv4: ipv4,
-      configuration: configuration
-    })
-  end
-
   defp changeset_from_config(adapter, config) do
     Adapter.changeset(adapter, %{
       mutable: true,
-      type: config[:type],
-      ipv4: config[:ipv4],
-      configuration: %{}
+      configuration: config
     })
   end
 end

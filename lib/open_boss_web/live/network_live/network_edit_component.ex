@@ -1,33 +1,24 @@
-defmodule OpenBossWeb.NetworkLive.WifiFormComponent do
+defmodule OpenBossWeb.NetworkLive.NetworkEditComponent do
   @moduledoc """
-  Wifi form. Performs the necessary tap-dance to insert wifi configuration
-  into a network adapter.
+  Edit a network adapter
   """
   use OpenBossWeb, :live_component
 
   alias OpenBoss.Network
-  alias OpenBoss.Network.WifiConfiguration
-
-  require Logger
 
   @impl true
-  def update(%{adapter: %{configuration: configuration} = _adapter} = assigns, socket) do
-    changeset = WifiConfiguration.changeset(configuration)
+  def update(%{adapter: adapter} = assigns, socket) do
+    changeset = Network.change_adapter(adapter)
 
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:wifi_configuration, configuration)
      |> assign(:form, to_form(changeset))}
   end
 
   @impl true
-  def handle_event("validate", %{"wifi_configuration" => wifi_configuration}, socket) do
-    changeset =
-      socket.assigns.wifi_configuration
-      |> WifiConfiguration.changeset(wifi_configuration)
-      |> Map.put(:action, :validate)
-
+  def handle_event("validate", %{"adapter" => adapter_params}, socket) do
+    changeset = Network.change_adapter(socket.assigns.adapter, adapter_params)
     {:noreply, assign(socket, form: to_form(changeset))}
   end
 
