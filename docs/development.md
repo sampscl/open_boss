@@ -106,10 +106,20 @@ MIX_TARGET=rpi4_kiosk MIX_ENV=prod "$SHELL" -c 'mix firmware && ./upload.sh open
 
 https://github.com/nerves-project/nerves_system_x86_64?tab=readme-ov-file#running-in-qemu
 
-And upgrading works:
+Build firmware, make a raw disk, install firmware, and boot it up. Web server will be http://localhost:4000/.
+Use `poweroff` from iex shell to cleanly shut down:
 
 ```shell
-MIX_TARGET=x86_64 MIX_ENV=prod SSH_OPTIONS="-p 10022" ./upload.sh localhost
+MIX_TARGET=x86_64 MIX_ENV=prod mix firmware
+qemu-img create -f raw disk.img 1G
+fwup -d disk.img _build/x86_64_prod/nerves/images/open_boss.fw
+qemu-system-x86_64 -drive file=disk.img,if=virtio,format=raw -net nic,model=virtio -net user,hostfwd=tcp::10022-:22,hostfwd=tcp::4000-:80 -nographic -serial mon:stdio -m 1024
+```
+
+Put it all together with a build and upgrade:
+
+```shell
+MIX_TARGET=x86_64 MIX_ENV=prod mix firmware && MIX_TARGET=x86_64 MIX_ENV=prod SSH_OPTIONS="-p 10022" ./upload.sh localhost
 ```
 
 ## VintageNet

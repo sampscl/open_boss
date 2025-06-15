@@ -40,9 +40,6 @@ defmodule OpenBoss.Host.Network do
   end
 
   @impl Network
-  def needs_wifi_config?, do: false
-
-  @impl Network
   def run_vintage_net_wizard(), do: raise("VintageNet not implmented on host platform")
 
   @impl Network

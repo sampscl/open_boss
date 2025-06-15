@@ -14,7 +14,11 @@ defmodule OpenBoss.Application do
     Logger.info("Starting")
 
     if Network.needs_wifi_config?() do
-      Logger.warning("WiFi configuation needed")
+      Logger.warning("***********************************")
+      Logger.warning("* WiFi configuation needed        *")
+      Logger.warning("* Power Off then On when finished *")
+      Logger.warning("***********************************")
+      :ok = Network.put_needs_wifi_config(false)
       Network.run_vintage_net_wizard()
     else
       if :debug == Logger.level() do

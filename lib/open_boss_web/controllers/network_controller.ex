@@ -10,20 +10,11 @@ defmodule OpenBossWeb.NetworkController do
   require Logger
 
   def reset_wifi(conn, _) do
-    Logger.warning("Resetting WiFi")
-
-    Network.list_adapters()
-    |> Enum.each(fn
-      %{id: id, configuration: %{"type" => VintageNetWiFi}} ->
-        _ = Network.reset_to_defaults(id)
-
-      _adapter ->
-        :ok
-    end)
+    :ok = Network.put_needs_wifi_config(true)
 
     {:ok, _pid} =
       Task.start(fn ->
-        Logger.warning("Rebooting")
+        Logger.warning("Rebooting for WiFi config")
         Process.sleep(1_000)
         System.reboot()
       end)

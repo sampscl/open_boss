@@ -1,5 +1,8 @@
 import Config
 
+# Network wizard on startup
+config :open_boss, OpenBoss.Network, wizard_file: "/root/start_vintage_net_wizard"
+
 # Timezone database
 config :tzdata, :data_dir, "/root/"
 

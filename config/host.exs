@@ -11,3 +11,6 @@ config :open_boss, OpenBoss.Boot, implementation: OpenBoss.Host.Boot
 config :vintage_net,
   resolvconf: "/dev/null",
   persistence: VintageNet.Persistence.Null
+
+# Network wizard on startup
+config :open_boss, OpenBoss.Network, wizard_file: "./start_vintage_net_wizard"

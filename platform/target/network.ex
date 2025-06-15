@@ -5,9 +5,9 @@ defmodule OpenBoss.Target.Network do
   alias OpenBoss.Network
   alias OpenBoss.Network.Adapter
 
-  require Logger
-
   @behaviour Network
+
+  require Logger
 
   @props [
     ["config"],
@@ -19,6 +19,18 @@ defmodule OpenBoss.Target.Network do
     ["wifi", "current_ap"]
   ]
 
+  @empty_adapter %{
+    "config" => nil,
+    "connection" => nil,
+    "state" => nil,
+    "type" => nil,
+    "addresses" => nil,
+    "wifi" => %{
+      "access_points" => nil,
+      "current_ap" => nil
+    }
+  }
+
   @impl Network
   def list_adapters do
     (VintageNet.configured_interfaces() -- ["lo"]) |> Enum.map(&get_adapter!/1)
@@ -28,8 +40,12 @@ defmodule OpenBoss.Target.Network do
   def get_adapter!(interface) do
     config =
       VintageNet.get_by_prefix(["interface", interface])
-      |> Enum.reduce(%{}, fn
+      |> Enum.reduce(@empty_adapter, fn
         {["interface", ^interface | prop], value}, acc when prop in @props ->
+          Logger.debug(inspect({acc, prop, value}, pretty: true, limit: :infinity),
+            limit: :infinity
+          )
+
           put_in(acc, prop, value)
 
         _, acc ->
@@ -43,19 +59,6 @@ defmodule OpenBoss.Target.Network do
   @impl Network
   def apply_configuration(_) do
     raise("Not implemented")
-  end
-
-  @impl Network
-  def needs_wifi_config? do
-    # If any adapters are connected, we do not need WiFi config
-    list_adapters()
-    |> Enum.any?(fn
-      %{"connection" => connection} when connection != :disconnected ->
-        true
-
-      _ ->
-        false
-    end)
   end
 
   @impl Network

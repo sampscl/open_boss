@@ -6,11 +6,12 @@ defmodule OpenBoss.Network do
   alias Ecto.Changeset
   alias OpenBoss.Network.Adapter
 
+  @wizard_file Application.compile_env!(:open_boss, [__MODULE__, :wizard_file])
+
   @callback list_adapters() :: list(Adapter.t())
   @callback get_adapter!(String.t()) :: Adapter.t()
   @callback apply_configuration(Adapter.t()) ::
               :ok | {:error, any()}
-  @callback needs_wifi_config?() :: boolean()
   @callback run_vintage_net_wizard() :: Supervisor.on_start()
   @callback reset_to_defaults(String.t()) :: :ok
 
@@ -24,9 +25,6 @@ defmodule OpenBoss.Network do
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
 
   defdelegate change_adapter(adapter, params \\ %{}), to: Adapter, as: :changeset
-
-  defdelegate needs_wifi_config?,
-    to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
 
   defdelegate run_vintage_net_wizard,
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
@@ -47,5 +45,18 @@ defmodule OpenBoss.Network do
   def hostname do
     {:ok, host} = :inet.gethostname()
     to_string(host) <> ".local"
+  end
+
+  @spec needs_wifi_config?() :: boolean()
+  def needs_wifi_config? do
+    File.exists?(@wizard_file)
+  end
+
+  @spec put_needs_wifi_config(boolean()) :: :ok
+  def put_needs_wifi_config(true), do: File.write!(@wizard_file, "")
+
+  def put_needs_wifi_config(false) do
+    _ = File.rm(@wizard_file)
+    :ok
   end
 end
