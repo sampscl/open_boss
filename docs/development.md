@@ -4,7 +4,7 @@
 
 Urgent
 
-- [ ] Network config in UI
+- [x] Network config in UI
 - [ ] On-screen keyboard for pi kiosk
 - [ ] Installation system for less technical users
 - [ ] Adjust the device code to be more testable and write tests
