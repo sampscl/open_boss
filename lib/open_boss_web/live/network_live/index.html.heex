@@ -1,14 +1,14 @@
 <.header>
   Network
-  <:actions></:actions>
+  <:actions>
+    <.link href={~p"/network/reset_wifi"} method="post">
+      <.button>Reset WiFi and Reboot</.button>
+    </.link>
+  </:actions>
 </.header>
 
 <div class="mt-8 z-10 w-full">
-  <.table
-    id="adapters"
-    rows={@adapters}
-    row_click={fn adapter -> JS.navigate(~p"/network/#{adapter.id}") end}
-  >
+  <.table id="adapters" rows={@adapters}>
     <:col :let={adapter} label="Name">
       {adapter.id}
     </:col>
@@ -26,7 +26,7 @@
         <:item title="Addresses">
           {if addresses = adapter.configuration["addresses"] do
             Enum.map_join(addresses, "<br>", fn ip ->
-              Adapter.address_string(ip)
+              Adapter.brief_address_string(ip)
             end)
             |> Phoenix.HTML.raw()
           else
@@ -58,19 +58,3 @@
 </div>
 
 <div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
-
-<.modal
-  :if={@live_action == :wifi_configs}
-  id="wifi-configs-modal"
-  show
-  on_cancel={JS.patch(~p"/network/#{@adapter}")}
->
-  <.live_component
-    module={OpenBossWeb.NetworkLive.WifiConfigsComponent}
-    id={@adapter.id}
-    title="WiFi Networks"
-    adapter={@adapter}
-    configurations={@adapter.configurations}
-    patch={~p"/network/#{@adapter}"}
-  />
-</.modal>

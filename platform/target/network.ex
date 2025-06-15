@@ -45,6 +45,30 @@ defmodule OpenBoss.Target.Network do
     raise("Not implemented")
   end
 
+  @impl Network
+  def needs_wifi_config? do
+    # If any adapters are connected, we do not need WiFi config
+    list_adapters()
+    |> Enum.any?(fn
+      %{"connection" => connection} when connection != :disconnected ->
+        true
+
+      _ ->
+        false
+    end)
+  end
+
+  @impl Network
+  def run_vintage_net_wizard do
+    VintageNetWizard.run_wizard()
+  end
+
+  @impl Network
+  def reset_to_defaults(interface) do
+    _ = VintageNet.reset_to_defaults(interface)
+    :ok
+  end
+
   @spec changeset_from_config(Adapter.t(), map()) :: Ecto.Changeset.t()
   defp changeset_from_config(adapter, config) do
     Adapter.changeset(adapter, %{

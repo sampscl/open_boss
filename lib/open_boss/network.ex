@@ -10,6 +10,9 @@ defmodule OpenBoss.Network do
   @callback get_adapter!(String.t()) :: Adapter.t()
   @callback apply_configuration(Adapter.t()) ::
               :ok | {:error, any()}
+  @callback needs_wifi_config?() :: boolean()
+  @callback run_vintage_net_wizard() :: Supervisor.on_start()
+  @callback reset_to_defaults(String.t()) :: :ok
 
   defdelegate list_adapters,
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
@@ -21,6 +24,15 @@ defmodule OpenBoss.Network do
     to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
 
   defdelegate change_adapter(adapter, params \\ %{}), to: Adapter, as: :changeset
+
+  defdelegate needs_wifi_config?,
+    to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
+
+  defdelegate run_vintage_net_wizard,
+    to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
+
+  defdelegate reset_to_defaults(interface),
+    to: Application.compile_env!(:open_boss, [__MODULE__, :implementation])
 
   @spec update_adapter(Adapter.t(), map()) ::
           {:ok, Adapter.t()} | {:error, Changeset.t()}

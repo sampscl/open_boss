@@ -6,6 +6,8 @@ defmodule OpenBoss.Network.Adapter do
   use Ecto.Schema
   import Ecto.Changeset
 
+  require Logger
+
   @type t() :: %__MODULE__{}
 
   @required [:id, :configuration]
@@ -45,6 +47,18 @@ defmodule OpenBoss.Network.Adapter do
     |> validate_required(@required)
   end
 
+  @spec validate_configuration(t(), map()) :: Ecto.Changset.t()
+  def validate_configuration(adapter, params) do
+    changeset(adapter, params)
+    |> validate_change(:configuration, fn :configuration, configuration ->
+      if VintageNet.configuration_valid?(adapter.id, configuration) do
+        []
+      else
+        [configuration: "Not Valid"]
+      end
+    end)
+  end
+
   @spec connection_name(atom()) :: String.t()
   def connection_name(:disconnected), do: "Disconnected"
   def connection_name(:internet), do: "Connected (internet)"
@@ -56,10 +70,15 @@ defmodule OpenBoss.Network.Adapter do
     Map.fetch!(@types, type)
   end
 
+  @spec brief_address_string(map()) :: String.t()
+  def brief_address_string(ip) do
+    "#{VintageNet.IP.ip_to_string(ip.address)}"
+  end
+
   @spec address_string(map()) :: String.t()
   def address_string(ip) do
     netmask = Tuple.to_list(ip.netmask) |> Enum.join(".")
-    "#{VintageNet.IP.ip_to_string(ip.address)}/#{netmask}"
+    brief_address_string(ip) <> "/#{netmask}"
   end
 
   @spec ap_string(VintageNetWiFi.AccessPoint.t()) :: String.t()

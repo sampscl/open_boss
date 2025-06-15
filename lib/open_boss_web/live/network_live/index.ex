@@ -45,12 +45,8 @@ defmodule OpenBossWeb.NetworkLive.Index do
   end
 
   @impl true
-  def handle_info({OpenBossWeb.NetworkLive.WifiFormComponent, {:saved, _adapter}}, socket) do
+  def handle_info({VintageNet, ["interface", _interface, _prop], old, new, _metadata}, socket) do
+    Logger.info("Got update; old: #{inspect(old)}, new: #{inspect(new)} ")
     {:noreply, assign(socket, :adapters, Network.list_adapters())}
-  end
-
-  @impl true
-  def handle_info({VintageNet, ["interface", _interface, _prop], _old, _new, _metadata}, socket) do
-    {:noreply, socket}
   end
 end

@@ -10,6 +10,7 @@ config :open_boss, HelloLiveViewWeb.Endpoint,
   watchers: []
 
 config :open_boss, OpenBoss.Network, implementation: OpenBoss.Target.Network
+config :open_boss, OpenBoss.System, implementation: OpenBoss.Target.System
 
 # Use Ringlogger as the logger backend and remove :console.
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
