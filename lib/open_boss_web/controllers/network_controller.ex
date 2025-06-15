@@ -7,7 +7,11 @@ defmodule OpenBossWeb.NetworkController do
   alias OpenBoss.Network
   alias OpenBoss.System
 
+  require Logger
+
   def reset_wifi(conn, _) do
+    Logger.warning("Resetting WiFi")
+
     Network.list_adapters()
     |> Enum.each(fn
       %{id: id, configuration: %{"type" => VintageNetWiFi}} ->
@@ -17,7 +21,12 @@ defmodule OpenBossWeb.NetworkController do
         :ok
     end)
 
-    {:ok, _pid} = Task.start(&System.reboot/0)
+    {:ok, _pid} =
+      Task.start(fn ->
+        Logger.warning("Rebooting")
+        Process.sleep(1_000)
+        System.reboot()
+      end)
 
     redirect(conn, to: ~p"/")
   end
