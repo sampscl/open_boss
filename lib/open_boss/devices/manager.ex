@@ -92,6 +92,7 @@ defmodule OpenBoss.Devices.Manager do
         where: d.id in ^Map.keys(mqtt_pids)
       )
       |> Repo.all()
+      |> Enum.map(fn device -> %Device{devices | online?: true} end)
 
     {:reply, result, state}
   end
