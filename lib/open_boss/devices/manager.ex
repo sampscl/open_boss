@@ -77,7 +77,7 @@ defmodule OpenBoss.Devices.Manager do
   @impl GenServer
   def handle_call({:device_state, device_id}, _from, %{mqtt_pids: mqtt_pids} = state) do
     if Map.has_key?(mqtt_pids, device_id) do
-      device = load_device(device_id)
+      device = %Device{load_device(device_id) | online?: true}
       {:reply, {:ok, device}, state}
     else
       # do not give active device state for inactive devices
@@ -92,7 +92,7 @@ defmodule OpenBoss.Devices.Manager do
         where: d.id in ^Map.keys(mqtt_pids)
       )
       |> Repo.all()
-      |> Enum.map(fn device -> %Device{devices | online?: true} end)
+      |> Enum.map(fn device -> %Device{device | online?: true} end)
 
     {:reply, result, state}
   end
@@ -113,7 +113,7 @@ defmodule OpenBoss.Devices.Manager do
       end)
       |> Ecto.Multi.run(:device, fn _repo, _changes ->
         if device = load_device(device_id) do
-          {:ok, device}
+          {:ok, %Device{device | online?: true}}
         else
           {:error, :not_found}
         end
@@ -181,6 +181,8 @@ defmodule OpenBoss.Devices.Manager do
         {:DOWN, _ref, :process, pid, reason},
         %{mqtt_pids: mqtt_pids, device_ids: device_ids} = state
       ) do
+    # Should not be a performance problem, as managing more
+    # than a few devices at a time is unlikely
     maybe_device_id =
       Enum.reduce_while(mqtt_pids, nil, fn {device_id, mqtt_pid}, _ ->
         if mqtt_pid == pid, do: {:halt, device_id}, else: {:cont, nil}
@@ -193,7 +195,7 @@ defmodule OpenBoss.Devices.Manager do
         Phoenix.PubSub.broadcast(
           OpenBoss.PubSub,
           Topics.device_presence(),
-          {:worker_lost, %{device | online?: false}}
+          {:worker_lost, %Device{device | online?: false}}
         )
 
       {:noreply,
@@ -217,7 +219,8 @@ defmodule OpenBoss.Devices.Manager do
 
     if device = load_device(maybe_device_id) do
       {:ok, updated_device} =
-        Payload.handle_payload(device, payload)
+        Map.put(device, online?: true)
+        |> Payload.handle_payload(payload)
         |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now()})
         |> Repo.update()
 
@@ -269,12 +272,7 @@ defmodule OpenBoss.Devices.Manager do
 
   @spec load_device(integer() | nil) :: Device.t() | nil
   defp load_device(nil), do: nil
-
-  defp load_device(device_id) do
-    with device <- Repo.get(Device, device_id) do
-      Map.put(device, :online?, true)
-    end
-  end
+  defp load_device(device_id), do: Repo.get(Device, device_id)
 
   if Application.compile_env!(:open_boss, __MODULE__) |> Keyword.fetch!(:enable_mqtt) do
     @spec start_mqtt({:ensure_managed, map()}, State.t()) :: {:noreply, State.t()}
