@@ -113,6 +113,20 @@ defmodule OpenBossWeb do
     end
   end
 
+  @spec localhost_request?(Plug.Conn.Adapter.peer_data()) :: boolean()
+  def localhost_request?(peer_data) do
+    case peer_data do
+      %{address: {127, 0, 0, 1}} ->
+        true
+
+      %{address: {0, 0, 0, 0, 0, 0, 0, 1}} ->
+        true
+
+      _ ->
+        false
+    end
+  end
+
   @doc """
   When used, dispatch to the appropriate controller/live_view/etc.
   """

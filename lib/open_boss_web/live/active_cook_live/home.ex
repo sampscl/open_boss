@@ -7,13 +7,17 @@ defmodule OpenBossWeb.ActiveCookLive.Home do
 
   @impl true
   def mount(_params, _session, socket) do
+    peer_data = get_connect_info(socket, :peer_data)
+    localhost_request? = OpenBossWeb.localhost_request?(peer_data)
+
     if connected?(socket) do
       :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, Topics.active_cook_update())
     end
 
     {:ok,
      assign(socket, :timezone, nil)
-     |> assign(:active_cooks, [])}
+     |> assign(:active_cooks, [])
+     |> assign(:localhost_request?, localhost_request?)}
   end
 
   @impl true

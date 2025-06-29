@@ -1,12 +1,13 @@
 <main class="flex flex-col items-center h-[calc(100vh-4rem)] container mx-auto px-4 pt-8">
   <div class="text-center z-10">
-    <h2 class="text-4xl font-semibold text-gray-800">Open Boss</h2>
-    <p class="mt-4 text-lg text-gray-600">
-      Manage your barbecue at
-      <.link href={"http://" <> OpenBoss.Network.hostname()}>
-        {"http://" <> OpenBoss.Network.hostname()}
-      </.link>
-    </p>
+    <%= if @localhost_request? do %>
+      <p class="mt-4 text-lg text-gray-600">
+        Manage your barbecue at
+        <.link href={"http://" <> OpenBoss.Network.hostname()}>
+          {"http://" <> OpenBoss.Network.hostname()}
+        </.link>
+      </p>
+    <% end %>
   </div>
   <div id="timezone-hook" phx-hook="Timezone" />
   <div class="mt-8 z-10 w-full">
