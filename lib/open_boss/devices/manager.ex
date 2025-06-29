@@ -219,9 +219,8 @@ defmodule OpenBoss.Devices.Manager do
 
     if device = load_device(maybe_device_id) do
       {:ok, updated_device} =
-        Map.put(device, online?: true)
-        |> Payload.handle_payload(payload)
-        |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now()})
+        Payload.handle_payload(device, payload)
+        |> Ecto.Changeset.change(%{last_communication: DateTime.utc_now(), online?: true})
         |> Repo.update()
 
       :ok = pub_device_state!(updated_device)

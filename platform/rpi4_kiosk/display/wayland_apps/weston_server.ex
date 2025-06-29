@@ -87,7 +87,7 @@ defmodule OpenBoss.Rpi4Kiosk.Display.WaylandApps.WestonServer do
     MuonTrap.Daemon.start_link("weston", ~w"#{args}",
       env: env,
       stderr_to_stdout: true,
-      log_output: :debug,
+      log_output: :info,
       log_prefix: "weston: "
     )
     |> then(fn {:ok, pid} -> pid end)
