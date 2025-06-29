@@ -11,12 +11,6 @@ defmodule OpenBoss.Factory do
     }
   end
 
-  def wifi_configuration_factory do
-    %OpenBoss.Network.WifiConfiguration{
-      networks: [%{ssid: "some ssid", psk: "some secret"}]
-    }
-  end
-
   def device_factory do
     %OpenBoss.Devices.Device{
       id: 1,
