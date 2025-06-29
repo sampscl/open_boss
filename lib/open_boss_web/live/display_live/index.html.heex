@@ -20,12 +20,7 @@
 
 <div class="-z-10 absolute inset-0 bg-custom-artwork bg-cover bg-center" style="top: 4rem;" />
 
-<.modal
-  :if={@live_action in [:edit]}
-  id="display-modal"
-  show
-  on_cancel={JS.patch(~p"/display")}
->
+<.modal :if={@live_action in [:edit]} id="display-modal" show on_cancel={JS.patch(~p"/display")}>
   <.live_component
     module={OpenBossWeb.DisplayLive.FormComponent}
     id={@display.id || :new}
