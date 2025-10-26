@@ -2,11 +2,12 @@ defmodule OpenBossWeb.DevicesLive.Index do
   use OpenBossWeb, :live_view
 
   alias OpenBoss.Devices
+  alias OpenBoss.Topics
 
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket) do
-      :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, "device-presence")
+      :ok = Phoenix.PubSub.subscribe(OpenBoss.PubSub, Topics.device_presence())
     end
 
     {
