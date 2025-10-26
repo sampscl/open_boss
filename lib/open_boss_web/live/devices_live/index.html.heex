@@ -22,7 +22,7 @@
     {OpenBoss.Devices.Device.get_name(device)}
   </:col>
 
-  <:col :let={{_id, device}} label="Set Temp">
+  <:col :let={{_id, device}} label="Desired Temp">
     <%= if device.online? do %>
       {"#{OpenBoss.Utils.display_temp(device.set_temp)}"}
     <% else %>
