@@ -20,4 +20,9 @@ defmodule OpenBoss.TestNetwork do
   def apply_configuration(_adapter) do
     :ok
   end
+
+  @impl Network
+  def run_vintage_net_wizard do
+    :ignore
+  end
 end

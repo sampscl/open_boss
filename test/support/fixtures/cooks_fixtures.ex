@@ -12,6 +12,7 @@ defmodule OpenBoss.CooksFixtures do
       attrs
       |> Enum.into(%{
         name: "some name",
+        target_temp: 100.0,
         start_time: ~U[2024-12-22 00:00:00.000000Z]
       })
       |> OpenBoss.Cooks.create_cook()

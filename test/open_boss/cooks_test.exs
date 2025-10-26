@@ -24,7 +24,11 @@ defmodule OpenBoss.CooksTest do
     end
 
     test "create_cook/1 with valid data creates a cook" do
-      valid_attrs = %{name: "some name", start_time: ~U[2024-12-22 00:00:00.000000Z]}
+      valid_attrs = %{
+        name: "some name",
+        target_temp: 100.0,
+        start_time: ~U[2024-12-22 00:00:00.000000Z]
+      }
 
       assert {:ok, %Cook{} = cook} = Cooks.create_cook(valid_attrs)
       assert cook.name == "some name"
@@ -40,6 +44,7 @@ defmodule OpenBoss.CooksTest do
               %Ecto.Changeset{errors: [stop_time: {"cannot be less than start_time", []}]}} =
                Cooks.create_cook(%{
                  name: "some name",
+                 target_temp: 100.0,
                  start_time: ~U[2024-12-22 00:00:00.000000Z],
                  stop_time: ~U[2024-12-21 00:00:00.000000Z]
                })
@@ -113,6 +118,7 @@ defmodule OpenBoss.CooksTest do
       assert {:ok, _cook2} =
                Cooks.create_cook(%{
                  name: "some other cook",
+                 target_temp: 30.0,
                  device_id: device.id,
                  start_time: ~U[2024-12-31 01:00:00Z],
                  stop_time: ~U[2024-12-31 01:00:00Z]
@@ -132,6 +138,7 @@ defmodule OpenBoss.CooksTest do
       assert {:error, cs} =
                Cooks.create_cook(%{
                  name: "some other cook",
+                 target_temp: 100.0,
                  device_id: device.id,
                  start_time: ~U[2024-12-31 01:00:00Z],
                  stop_time: nil
