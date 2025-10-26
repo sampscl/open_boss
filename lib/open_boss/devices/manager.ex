@@ -76,12 +76,14 @@ defmodule OpenBoss.Devices.Manager do
 
   @impl GenServer
   def handle_call({:device_state, device_id}, _from, %{mqtt_pids: mqtt_pids} = state) do
-    if Map.has_key?(mqtt_pids, device_id) do
-      device = %Device{load_device(device_id) | online?: true}
-      {:reply, {:ok, device}, state}
-    else
-      # do not give active device state for inactive devices
-      {:reply, {:error, :not_found}, state}
+    case {Map.has_key?(mqtt_pids, device_id), load_device(device_id)} do
+      {false, _} ->
+        # do not give active device state for inactive devices
+        {:reply, {:error, :not_found}, state}
+
+      {true, %Device{} = loaded} ->
+        device = %Device{loaded | online?: true}
+        {:reply, {:ok, device}, state}
     end
   end
 
@@ -92,7 +94,7 @@ defmodule OpenBoss.Devices.Manager do
         where: d.id in ^Map.keys(mqtt_pids)
       )
       |> Repo.all()
-      |> Enum.map(fn device -> %Device{device | online?: true} end)
+      |> Enum.map(fn %Device{} = device -> %Device{device | online?: true} end)
 
     {:reply, result, state}
   end
@@ -112,7 +114,7 @@ defmodule OpenBoss.Devices.Manager do
         end
       end)
       |> Ecto.Multi.run(:device, fn _repo, _changes ->
-        if device = load_device(device_id) do
+        if %Device{} = device = load_device(device_id) do
           {:ok, %Device{device | online?: true}}
         else
           {:error, :not_found}
@@ -188,7 +190,7 @@ defmodule OpenBoss.Devices.Manager do
         if mqtt_pid == pid, do: {:halt, device_id}, else: {:cont, nil}
       end)
 
-    if device = load_device(maybe_device_id) do
+    if %Device{} = device = load_device(maybe_device_id) do
       Logger.info("Lost device #{inspect({pid, device, reason})}")
 
       :ok =

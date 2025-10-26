@@ -8,6 +8,7 @@
       {assigns[:page_title] || "OpenBoss"}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <link phx-track-static rel="stylesheet" href={~p"/assets/keyboard.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
@@ -46,5 +47,10 @@
   </header>
   <body class="bg-white bg-cover bg-no-repeat bg-center min-h-screen">
     {@inner_content}
+    <div id="keyboard-container" style="margin-bottom: 230px;" phx-update="ignore">
+      <div class="fixed bottom-0 left-0 right-0">
+        <div class="simple-keyboard"></div>
+      </div>
+    </div>
   </body>
 </html>
