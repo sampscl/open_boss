@@ -22,6 +22,10 @@
     end}
   </:item>
 
+  <:item title="Target Temperature">
+    {OpenBoss.Utils.celsius_to_farenheit(@cook.target_temp) |> round()}
+  </:item>
+
   <:item title="Start Time">
     {if @cook.start_time && @timezone,
       do: OpenBoss.Utils.dt_to_browser_time_string(@cook.start_time, @timezone)}

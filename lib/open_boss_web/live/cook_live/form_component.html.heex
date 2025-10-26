@@ -45,6 +45,28 @@
     </div>
 
     <div class="field">
+      <label for="target_temp">Target Temperature (&deg;F)</label>
+      <.input
+        type="number"
+        name="cook[target_temp]"
+        id="cook_set_target_temp"
+        value={
+          if @form[:target_temp].value do
+            OpenBoss.Utils.celsius_to_farenheit(@form[:target_temp].value) |> round()
+          else
+            nil
+          end
+        }
+      />
+      <%= if @form.errors[:set_temp] do %>
+        <span class="error">
+          {{msg, _} = @form.errors[:set_temp]
+          msg}
+        </span>
+      <% end %>
+    </div>
+
+    <div class="field">
       <label for="cook_start_time">Start Time</label>
       <.input
         type="datetime-local"

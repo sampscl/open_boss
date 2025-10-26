@@ -19,7 +19,7 @@ defmodule OpenBoss.Cooks do
 
   """
   def list_cooks do
-    Repo.all(from(c in Cook, preload: :device))
+    Repo.all(from(c in Cook, preload: :device, order_by: [desc: c.start_time]))
   end
 
   @doc """
@@ -128,5 +128,12 @@ defmodule OpenBoss.Cooks do
   def get_cook_history_for_id(cook_id) do
     from(h in CookHistory, where: h.cook_id == ^cook_id)
     |> Repo.all()
+  end
+
+  @doc """
+  Predict cook completion
+  """
+  def predict_completion(%Cook{} = _cook) do
+    nil
   end
 end

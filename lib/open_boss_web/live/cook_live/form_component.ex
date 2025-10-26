@@ -3,6 +3,7 @@ defmodule OpenBossWeb.CookLive.FormComponent do
 
   alias OpenBoss.Cooks
   alias OpenBoss.Devices
+  alias OpenBoss.Utils
 
   require Logger
 
@@ -69,5 +70,14 @@ defmodule OpenBossWeb.CookLive.FormComponent do
     for field <- ["start_time", "stop_time"], into: cook_params do
       {field, OpenBoss.Utils.browser_time_to_dt(cook_params[field], timezone)}
     end
+    |> Map.update!("target_temp", fn farenheit ->
+      case Float.parse(farenheit) do
+        {val, _} ->
+          Utils.farenheit_to_celsius(val)
+
+        _invalid ->
+          nil
+      end
+    end)
   end
 end

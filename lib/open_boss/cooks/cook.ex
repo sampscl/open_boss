@@ -8,7 +8,7 @@ defmodule OpenBoss.Cooks.Cook do
   alias OpenBoss.Cooks.CookHistory
   alias OpenBoss.Devices.Device
 
-  @required_fields [:name, :start_time]
+  @required_fields [:name, :start_time, :target_temp]
   @fields @required_fields ++ [:device_id, :stop_time, :device_id, :notes]
 
   @type t() :: %__MODULE__{}
@@ -17,6 +17,7 @@ defmodule OpenBoss.Cooks.Cook do
     field(:name, :string)
     field(:start_time, :utc_datetime_usec)
     field(:stop_time, :utc_datetime_usec)
+    field(:target_temp, :float)
     field(:notes, :string)
     belongs_to(:device, Device)
     has_many(:cook_history, CookHistory)

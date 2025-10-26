@@ -15,7 +15,15 @@ defmodule OpenBoss.Devices do
   Get a list of all devices, active and inactive
   """
   @spec list() :: list(Device.t())
-  def list, do: OpenBoss.Repo.all(Device)
+  def list do
+    OpenBoss.Repo.all(Device)
+    |> Enum.map(fn device ->
+      case Manager.device_state(device.id) do
+        {:ok, online_device} -> online_device
+        {:error, :not_found} -> device
+      end
+    end)
+  end
 
   @doc """
   Get most current state of a given device
