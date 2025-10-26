@@ -5,7 +5,8 @@ defmodule OpenBoss.MixProject do
   @all_targets [
     :rpi4,
     :rpi4_kiosk,
-    :x86_64
+    :x86_64,
+    :trellis_eink
   ]
 
   def project do
@@ -14,15 +15,18 @@ defmodule OpenBoss.MixProject do
       version: "0.1.1",
       elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env(), Mix.target()),
-      archives: [nerves_bootstrap: "~> 1.13"],
+      archives: [nerves_bootstrap: "~> 1.14"],
       compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
       releases: [{@app, release()}],
-      preferred_cli_target: [run: :host, test: :host],
       dialyzer: [plt_add_apps: [:mix], ignore_warnings: "dialyzer_ignore_warnings.exs"]
     ]
+  end
+
+  def cli do
+    [run: :host, test: :host]
   end
 
   # Configuration for the OTP application.
@@ -100,7 +104,8 @@ defmodule OpenBoss.MixProject do
       #
 
       # Dependencies for all targets
-      {:nerves, "~> 1.7.16 or ~> 1.8.0 or ~> 1.9.0 or ~> 1.10.4 or ~> 1.11.0", runtime: false},
+      # {:nerves, "~> 1.7.16 or ~> 1.8.0 or ~> 1.9.0 or ~> 1.10.4 or ~> 1.11.0", runtime: false},
+      {:nerves, "~> 1.11", runtime: false},
       {:shoehorn, "~> 0.9.1"},
       {:ring_logger, "~> 0.11.0"},
       {:toolshed, "~> 0.4.0"},
@@ -117,14 +122,26 @@ defmodule OpenBoss.MixProject do
       # do an override and revisit this later
       {:cowlib, ">= 2.14.0 and < 3.0.0", override: true},
 
+      # nerves_system_br lock because conflict between trellis and rpi4
+      {:nerves_system_br, "== 1.31.7", override: true},
+
       # Dependencies for specific targets
+      {:circuits_spi, "~> 2.0", targets: :trellis_eink},
+      {:circuits_gpio, "~> 2.1.3", targets: :trellis_eink},
+      {:eink, github: "protolux-electronics/eink", targets: :trellis_eink},
+
+      # Nerves systems for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version
       # bumps to Nerves systems. Since these include Linux kernel and Erlang
       # version updates, please review their release notes in case
       # changes to your application are needed.
-      {:nerves_system_rpi4, "~> 1.19", runtime: false, targets: :rpi4},
-      {:kiosk_system_rpi4, "~> 0.2.0", runtime: false, targets: :rpi4_kiosk},
-      {:nerves_system_x86_64, "~> 1.19", runtime: false, targets: :x86_64}
+      {:nerves_system_rpi4, "~> 1.31", runtime: false, targets: :rpi4},
+      {:kiosk_system_rpi4, "~> 0.4", runtime: false, targets: :rpi4_kiosk},
+      {:nerves_system_x86_64, "~> 1.31", runtime: false, targets: :x86_64},
+      {:nerves_system_trellis,
+       github: "protolux-electronics/nerves_system_trellis",
+       runtime: false,
+       targets: :trellis_eink}
     ]
   end
 
