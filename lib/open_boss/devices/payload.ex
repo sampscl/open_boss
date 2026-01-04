@@ -18,9 +18,10 @@ defmodule OpenBoss.Devices.Payload do
   @spec encode_temp(celsius :: float()) :: raw :: integer()
   def encode_temp(celsius), do: round(celsius * 10.0)
 
-  @spec handle_payload(Device.t(), json :: String.t()) :: Ecto.Changeset.t(Device.t())
+  @spec handle_payload(Device.t(), payload :: String.t()) :: Ecto.Changeset.t(Device.t())
   def handle_payload(device, payload) do
-    update_state(device, Jason.decode(payload))
+    json = :binary.decode_hex(payload)
+    update_state(device, Jason.decode(json))
   end
 
   @spec update_state(Device.t(), {:ok, map()} | {:error, any()}) ::
