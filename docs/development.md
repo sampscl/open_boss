@@ -104,9 +104,9 @@ MIX_TARGET=rpi4_kiosk MIX_ENV=prod "$SHELL" -c 'mix firmware && ./upload.sh open
 
 ## Running in QEMU
 
-https://github.com/nerves-project/nerves_system_x86_64?tab=readme-ov-file#running-in-qemu
+<https://github.com/nerves-project/nerves_system_x86_64?tab=readme-ov-file#running-in-qemu>
 
-Build firmware, make a raw disk, install firmware, and boot it up. Web server will be http://localhost:4000/.
+Build firmware, make a raw disk, install firmware, and boot it up. Web server will be <http://localhost:4000/>.
 Use `poweroff` from iex shell to cleanly shut down:
 
 ```shell
@@ -374,7 +374,7 @@ Example output from `VintegeNet.get_by_prefix([])` on a raspberry pi 4:
 - Blower values are percentage \* 100, so 10000 is 100%
 - Publish to `flameboss/<DEVICE_SERIAL_NUMBER>/recv`
 - Receive from `flameboss/<DEVICE_SERIAL_NUMBER>/send`, though there are other active topics
-- Data payloads are JSON
+- Data payloads are JSON that has been binary encoded as hexadecimal
 - The data payload seems to always have a `name` key that identifies the shape and purpose of the payload
 - The temps array looks like this:
 
@@ -388,7 +388,7 @@ Example output from `VintegeNet.get_by_prefix([])` on a raspberry pi 4:
 
 ### Known `recv` Messages
 
-These are sent to the device (it is the receiver)
+These are sent to the device (it is the receiver). They need to be binary encoded JSON as well.
 
 Set temp to `flameboss/<DEVICE_SERIAL_NUMBER>/recv`
 
