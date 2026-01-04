@@ -114,10 +114,9 @@ defmodule OpenBoss.Devices.Manager do
         end
       end)
       |> Ecto.Multi.run(:device, fn _repo, _changes ->
-        if %Device{} = device = load_device(device_id) do
-          {:ok, %Device{device | online?: true}}
-        else
-          {:error, :not_found}
+        case load_device(device_id) do
+          %Device{} = device -> {:ok, %Device{device | online?: true}}
+          _ -> {:error, :not_found}
         end
       end)
       |> Ecto.Multi.run(:mqtt_pub, fn _repo, %{mqtt_pid: mqtt_pid} ->
@@ -189,25 +188,27 @@ defmodule OpenBoss.Devices.Manager do
         if mqtt_pid == pid, do: {:halt, device_id}, else: {:cont, nil}
       end)
 
-    if %Device{} = device = load_device(maybe_device_id) do
-      Logger.info("Lost device #{inspect({pid, device, reason})}")
+    case load_device(maybe_device_id) do
+      %Device{} = device ->
+        Logger.info("Lost device #{inspect({pid, device, reason})}")
 
-      :ok =
-        Phoenix.PubSub.broadcast(
-          OpenBoss.PubSub,
-          Topics.device_presence(),
-          {:worker_lost, %Device{device | online?: false}}
-        )
+        :ok =
+          Phoenix.PubSub.broadcast(
+            OpenBoss.PubSub,
+            Topics.device_presence(),
+            {:worker_lost, %Device{device | online?: false}}
+          )
 
-      {:noreply,
-       %{
-         state
-         | mqtt_pids: Map.delete(mqtt_pids, maybe_device_id),
-           device_ids: Map.delete(device_ids, pid)
-       }}
-    else
-      Logger.warning("Unknown device #{inspect({pid, reason})}")
-      {:noreply, state}
+        {:noreply,
+         %{
+           state
+           | mqtt_pids: Map.delete(mqtt_pids, maybe_device_id),
+             device_ids: Map.delete(device_ids, pid)
+         }}
+
+      _ ->
+        Logger.warning("Unknown device #{inspect({pid, reason})}")
+        {:noreply, state}
     end
   end
 
