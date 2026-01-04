@@ -126,15 +126,14 @@ defmodule OpenBoss.Devices.Manager do
         # sets the requested temperature. Eventually the MQTT will let
         # us know that the device set_temp has changed and the ui and
         # db will get updated.
-        :emqtt.publish(
-          mqtt_pid,
-          "flameboss/#{device_id}/recv",
+        msg =
           Jason.encode!(%{
             "name" => "set_temp",
             "value" => Payload.encode_temp(celsius)
           })
-        )
-        |> case do
+          |> :binary.encode_hex(:lowercase)
+
+        case :emqtt.publish(mqtt_pid, "flameboss/#{device_id}/recv", msg) do
           {:error, _} = err ->
             err
 
